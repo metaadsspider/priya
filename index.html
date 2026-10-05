@@ -1,7 +1,8 @@
-<!DOCTYPE html>
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
+
 <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -12,824 +13,315 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '989703450840669');
+fbq('init', '978802361906154');
 fbq('track', 'PageView');
 </script>
 <noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=989703450840669&ev=PageView&noscript=1"
+src="https://www.facebook.com/tr?id=978802361906154&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doom Prediction</title>
 
-<meta name="theme-color" content="#06111c">
-<meta name="description" content="Priya Toss - Cricket updates, match analysis and general information for cricket fans.">
-
-<title>Priya Toss | Cricket Updates</title>
-
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-<!-- Telegram Icon -->
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-<style>
-    :root {
-        --bg: #020617;
-        --bg-soft: #071522;
-        --card: rgba(255, 255, 255, 0.075);
-        --card-border: rgba(255, 255, 255, 0.14);
-
-        --primary: #ff7a18;
-        --primary-dark: #d94b00;
-        --secondary: #0ea5e9;
-
-        --green: #22c55e;
-        --yellow: #fde047;
-
-        --text: #f8fafc;
-        --muted: #aab6c5;
-    }
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    html {
-        scroll-behavior: smooth;
-    }
-
-    body {
-        min-height: 100vh;
-        overflow-x: hidden;
-
-        font-family: "Inter", sans-serif;
-        color: var(--text);
-
-        background:
-            radial-gradient(
-                circle at 15% 10%,
-                rgba(14, 165, 233, .20),
-                transparent 32%
-            ),
-            radial-gradient(
-                circle at 85% 80%,
-                rgba(255, 122, 24, .16),
-                transparent 32%
-            ),
-            linear-gradient(
-                145deg,
-                #020617 0%,
-                #06111c 50%,
-                #020617 100%
-            );
-    }
-
-    /* Background decoration */
-
-    .background {
-        position: fixed;
-        inset: 0;
-        z-index: -2;
-        overflow: hidden;
-        pointer-events: none;
-    }
-
-    .orb {
-        position: absolute;
-        width: 280px;
-        height: 280px;
-        border-radius: 50%;
-        filter: blur(90px);
-        opacity: .25;
-        animation: float 10s ease-in-out infinite alternate;
-    }
-
-    .orb.one {
-        top: 5%;
-        left: -80px;
-        background: var(--secondary);
-    }
-
-    .orb.two {
-        right: -100px;
-        bottom: 5%;
-        background: var(--primary);
-        animation-delay: 2s;
-    }
-
-    .grid {
-        position: absolute;
-        inset: 0;
-        opacity: .08;
-
-        background-image:
-            linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px);
-
-        background-size: 45px 45px;
-
-        mask-image: linear-gradient(
-            to bottom,
-            black,
-            transparent 80%
-        );
-    }
-
-    @keyframes float {
-        from {
-            transform: translate3d(0, 0, 0) scale(1);
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <style>
+        :root {
+            --primary: #6d320e;
+            --secondary: #0a3a49;
+            --accent: #9a2910;
+            --bg: #020617;
+            --text: #e5e7eb;
         }
 
-        to {
-            transform: translate3d(35px, -45px, 0) scale(1.12);
-        }
-    }
-
-    /* Main */
-
-    .hero {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        padding: 24px 16px;
-    }
-
-    .card {
-        width: 100%;
-        max-width: 500px;
-
-        position: relative;
-
-        padding: 34px 26px 24px;
-
-        text-align: center;
-
-        border: 1px solid var(--card-border);
-        border-radius: 30px;
-
-        background:
-            linear-gradient(
-                145deg,
-                rgba(255,255,255,.10),
-                rgba(255,255,255,.035)
-            );
-
-        backdrop-filter: blur(22px);
-        -webkit-backdrop-filter: blur(22px);
-
-        box-shadow:
-            0 30px 80px rgba(0,0,0,.50),
-            inset 0 1px 0 rgba(255,255,255,.10);
-
-        animation: cardIn .8s cubic-bezier(.2,.8,.2,1);
-    }
-
-    .card::before {
-        content: "";
-        position: absolute;
-        inset: -1px;
-
-        border-radius: inherit;
-
-        padding: 1px;
-
-        background: linear-gradient(
-            135deg,
-            rgba(255,255,255,.30),
-            transparent 35%,
-            rgba(255,122,24,.35)
-        );
-
-        -webkit-mask:
-            linear-gradient(#fff 0 0) content-box,
-            linear-gradient(#fff 0 0);
-
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-
-        pointer-events: none;
-    }
-
-    @keyframes cardIn {
-        from {
-            opacity: 0;
-            transform: translateY(35px) scale(.96);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-    }
-
-    /* Status badge */
-
-    .status {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-
-        padding: 8px 13px;
-        margin-bottom: 20px;
-
-        border-radius: 999px;
-
-        color: #bbf7d0;
-        background: rgba(34,197,94,.10);
-        border: 1px solid rgba(34,197,94,.20);
-
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: .5px;
-        text-transform: uppercase;
-    }
-
-    .status-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: var(--green);
-
-        box-shadow: 0 0 0 5px rgba(34,197,94,.10);
-
-        animation: pulse 1.8s infinite;
-    }
-
-    @keyframes pulse {
-        0%,100% {
-            opacity: 1;
-            transform: scale(1);
+        body {
+            background: radial-gradient(1200px 600px at top, var(--secondary), var(--bg));
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        50% {
-            opacity: .55;
-            transform: scale(.75);
-        }
-    }
-
-    /* Logo */
-
-    .logo-wrap {
-        position: relative;
-
-        width: 126px;
-        height: 126px;
-
-        margin: 0 auto 22px;
-    }
-
-    .logo-ring {
-        position: absolute;
-        inset: -6px;
-
-        border-radius: 50%;
-
-        background: conic-gradient(
-            from 0deg,
-            var(--primary),
-            var(--yellow),
-            var(--secondary),
-            var(--primary)
-        );
-
-        animation: spin 7s linear infinite;
-    }
-
-    .logo-ring::after {
-        content: "";
-        position: absolute;
-        inset: 3px;
-
-        border-radius: 50%;
-
-        background: #07111c;
-    }
-
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-
-    .heading-img {
-        position: relative;
-        z-index: 2;
-
-        width: 126px;
-        height: 126px;
-
-        display: block;
-
-        object-fit: cover;
-
-        border-radius: 50%;
-        border: 3px solid var(--yellow);
-
-        box-shadow:
-            0 12px 35px rgba(0,0,0,.45),
-            0 0 30px rgba(255,193,7,.10);
-
-        animation: imageIn .9s ease-out;
-    }
-
-    @keyframes imageIn {
-        from {
-            opacity: 0;
-            transform: scale(.7) rotate(-8deg);
+        .bg-blur {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
         }
 
-        to {
-            opacity: 1;
-            transform: scale(1) rotate(0);
-        }
-    }
-
-    /* Heading */
-
-    h1 {
-        font-size: clamp(32px, 8vw, 46px);
-        line-height: 1;
-
-        font-weight: 900;
-        letter-spacing: -1.8px;
-
-        margin-bottom: 13px;
-
-        background: linear-gradient(
-            90deg,
-            #fff,
-            #dbeafe 45%,
-            #fdba74
-        );
-
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-    }
-
-    .sub {
-        display: inline-block;
-
-        margin-bottom: 25px;
-        padding: 7px 10px;
-
-        border-radius: 7px;
-
-        color: #111827;
-
-        background: linear-gradient(
-            90deg,
-            #fde047,
-            #facc15
-        );
-
-        border: 1px solid rgba(0,0,0,.35);
-
-        font-family: "Trebuchet MS", sans-serif;
-
-        font-size: 12px;
-        font-weight: 700;
-        line-height: 1.4;
-
-        box-shadow: 0 5px 18px rgba(250,204,21,.10);
-    }
-
-    /* Countdown */
-
-    .timer-box {
-        margin-bottom: 20px;
-        padding: 14px;
-
-        border-radius: 16px;
-
-        background: rgba(255,255,255,.045);
-        border: 1px solid rgba(255,255,255,.08);
-    }
-
-    .timer-label {
-        margin-bottom: 7px;
-
-        color: var(--muted);
-
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 1.2px;
-        text-transform: uppercase;
-    }
-
-    .timer {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
-
-    .timer span {
-        min-width: 45px;
-
-        color: #86efac;
-
-        font-size: 25px;
-        font-weight: 900;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .timer small {
-        color: var(--muted);
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    /* CTA */
-
-    .cta {
-        width: 100%;
-    }
-
-    a.button {
-        width: 100%;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 11px;
-
-        min-height: 58px;
-
-        padding: 15px 20px;
-
-        border-radius: 17px;
-
-        color: white;
-        text-decoration: none;
-
-        background:
-            linear-gradient(
-                135deg,
-                #ff8a1f,
-                #e44d00
-            );
-
-        border: 1px solid rgba(255,255,255,.65);
-
-        font-size: 13px;
-        font-weight: 900;
-        letter-spacing: .25px;
-
-        box-shadow:
-            0 14px 35px rgba(229,81,0,.30),
-            inset 0 1px 0 rgba(255,255,255,.30);
-
-        transition:
-            transform .25s ease,
-            box-shadow .25s ease,
-            filter .25s ease;
-
-        position: relative;
-        overflow: hidden;
-    }
-
-    a.button::before {
-        content: "";
-
-        position: absolute;
-        top: 0;
-        left: -100%;
-
-        width: 70%;
-        height: 100%;
-
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255,255,255,.25),
-            transparent
-        );
-
-        transform: skewX(-20deg);
-
-        animation: shine 3.5s infinite;
-    }
-
-    @keyframes shine {
-        0%, 55% {
-            left: -100%;
+        .bg-blur span {
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            filter: blur(120px);
+            opacity: .35;
+            animation: float 12s infinite alternate ease-in-out;
         }
 
-        75%, 100% {
-            left: 140%;
+        .bg-blur span:nth-child(1) {
+            top: 10%;
+            left: 5%;
         }
-    }
 
-    a.button:hover {
-        transform: translateY(-3px);
-        filter: brightness(1.08);
+        .bg-blur span:nth-child(2) {
+            bottom: 15%;
+            right: 10%;
+            animation-delay: 3s;
+        }
 
-        box-shadow:
-            0 20px 45px rgba(229,81,0,.42),
-            inset 0 1px 0 rgba(255,255,255,.35);
-    }
+        @keyframes float {
+            from {
+                transform: translateY(0)
+            }
 
-    a.button:active {
-        transform: translateY(0) scale(.98);
-    }
-
-    a.button i {
-        font-size: 21px;
-    }
-
-    /* Trust points */
-
-    .features {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-
-        gap: 8px;
-
-        margin-top: 16px;
-    }
-
-    .feature {
-        padding: 11px 5px;
-
-        border-radius: 12px;
-
-        background: rgba(255,255,255,.035);
-        border: 1px solid rgba(255,255,255,.07);
-    }
-
-    .feature strong {
-        display: block;
-
-        margin-bottom: 3px;
-
-        color: #e2e8f0;
-
-        font-size: 11px;
-    }
-
-    .feature span {
-        color: #7f8da0;
-        font-size: 9px;
-    }
-
-    /* Disclaimer */
-
-    .disclaimer {
-        margin-top: 20px;
-        padding-top: 17px;
-
-        border-top: 1px dashed rgba(255,255,255,.15);
-
-        color: #8995a5;
-
-        font-size: 10.5px;
-        line-height: 1.65;
-    }
-
-    /* Ads */
-
-    .ads-by {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-
-        margin-top: 17px;
-        padding: 5px 10px;
-
-        color: #8995a5;
-        text-decoration: none;
-
-        font-size: 10px;
-
-        border-radius: 999px;
-
-        background: rgba(255,255,255,.035);
-        border: 1px solid rgba(255,255,255,.06);
-
-        transition: .2s ease;
-    }
-
-    .ads-by:hover {
-        background: rgba(255,255,255,.08);
-        color: white;
-    }
-
-    .ads-by b {
-        color: #60a5fa;
-    }
-
-    /* Mobile */
-
-    @media (max-width: 480px) {
+            to {
+                transform: translateY(-60px)
+            }
+        }
 
         .hero {
-            padding: 16px 12px;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
         }
 
         .card {
-            padding: 27px 17px 21px;
-            border-radius: 25px;
+            max-width: 520px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 28px;
+            padding: 36px 28px 32px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, .45);
+            animation: cardIn .9s ease-out;
         }
 
-        .logo-wrap,
-        .heading-img {
-            width: 108px;
-            height: 108px;
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(.96)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(34, 197, 94, .15);
+            color: #86efac;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        /* Center circular image on top */
+        .card .heading-img {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: block;
+            object-fit: cover;
+            animation: imgFade 1s ease-out;
+        }
+
+        @keyframes imgFade {
+            from {
+                opacity: 0;
+                transform: translateY(-20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
         }
 
         h1 {
-            font-size: 34px;
+            font-size: 40px;
+            line-height: 1.1;
+            font-weight: 800;
+            margin-bottom: 12px;
         }
 
         .sub {
-            max-width: 100%;
-            font-size: 10.5px;
+            font-size: 15px;
+            opacity: .85;
+            margin-bottom: 26px;
+            /* font-style:italic; */
+            background-color: yellow;
+            border-radius:4px;
+            border:1px solid black;
+            padding:4px 0px ;
+            color:black;
+            padding:0px 2px;
+            font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+
+        .timer {
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+
+        .timer span {
+            font-weight: 700;
+            color: #86efac;
+            font-size: 18px;
+        }
+
+        .cta {
+            display: flex;
+            justify-content: center;
         }
 
         a.button {
-            min-height: 55px;
-            font-size: 11.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 26px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #ffffff;
+            font-weight: 800;
+            text-decoration: none;
+            border: 2px solid white;
+            box-shadow: 0 20px 40px rgba(34, 197, 94, .45);
+            transform: translateZ(0);
+            transition: .3s ease;
         }
 
-        .features {
-            gap: 5px;
+        a.button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 28px 60px rgba(101, 13, 13, 0.65);
         }
 
-        .feature {
-            padding: 9px 3px;
+        .note {
+            margin-top: 18px;
+            font-size: 13px;
+            opacity: .75;
         }
-    }
 
-    @media (prefers-reduced-motion: reduce) {
-        *,
-        *::before,
-        *::after {
-            animation-duration: .01ms !important;
-            animation-iteration-count: 1 !important;
-            scroll-behavior: auto !important;
+        .disclaimer {
+            margin-top: 22px;
+            padding-top: 16px;
+            border-top: 1px dashed rgba(255, 255, 255, .25);
+            font-size: 12px;
+            line-height: 1.6;
+            opacity: .75;
         }
-    }
-</style>
-```
 
+        @media(max-width:480px) {
+            h1 {
+                font-size: 22px
+            }
+
+            .card {
+                padding: 30px 20px
+            }
+
+            .card .heading-img {
+                width: 100px;
+                height: 100px
+            }
+        }
+    </style>
 </head>
 
 <body>
-
-```
-<!-- Google Tag Manager (noscript) -->
-<noscript>
-    <iframe
-        src="https://www.googletagmanager.com/ns.html?id=GTM-KLBLCPZR"
-        height="0"
-        width="0"
-        style="display:none;visibility:hidden">
-    </iframe>
-</noscript>
-<!-- End Google Tag Manager (noscript) -->
-
-<!-- Background -->
-<div class="background" aria-hidden="true">
-    <div class="grid"></div>
-    <div class="orb one"></div>
-    <div class="orb two"></div>
-</div>
-
-<main class="hero">
-
-    <section class="card">
-
-        <!-- Status -->
-        <div class="status">
-            <span class="status-dot"></span>
-            Live Cricket Updates
+    
+    <div class="hero">
+        <div class="bg-blur">
+            <span></span>
+            <span></span>
         </div>
-
-        <!-- Logo -->
-        <div class="logo-wrap">
-            <div class="logo-ring"></div>
-
-            <img
-                src="IMG_20260930_231043_795.jpg"
-                alt="Priya Toss"
-                class="heading-img">
-        </div>
-
-        <!-- Heading -->
-        <h1>Priya Toss</h1>
-
-        <p class="sub">
-            Accurate analysis • Match Update • Right Pred!ction
-        </p>
-
-        <!-- Countdown -->
-        <div class="timer-box">
-
-            <div class="timer-label">
-                Free joining ends in
+        <div class="card">
+             <!-- Center circular image on top of heading -->
+            <img src="IMG_20260920_163204_438.jpg" alt="cricket Illustration" class="heading-img" style="border: 2px solid rgb(255, 221, 0);">
+            <h1>Doom Prediction</h1>
+            <p class="sub">Accurate analysis • Match Update • Right Pred!ction</p>
+            <div class="timer">FREE JOINING ENDS IN <span id="countdown">30</span>s</div>
+            <div class="cta">
+                <a href="https://tg-join-tracker.lovable.app/go/priya" target="_blank"  class="button"  >JOIN TELEGRAM FOR NEW UPDATE <i
+                        class="fa fa-telegram"></i></a>
             </div>
+  
+           
+            <div class="disclaimer">Disclaimer: This channel shares cricket updates, analysis, and general information
+                for fans. It does not promote betting or gambling. No outcomes are guaranteed. Please verify
+                independently and act responsibly.</div>
 
-            <div class="timer">
-                <span id="countdown">35</span>
-                <small>seconds</small>
-            </div>
-
+                   <!--  my link -->    <a href="https://t.me/SPIDYADSAGENCY" class="" style="  text-decoration: none;  padding:4px 2px; display:flex; place-items:center; place-content:center; " > <div class=""  style="padding:4px 2px; display:flex; place-items:center; place-content:center; " ><p class="" style="color:white;  text-decoration: none; margin-right:4px; " >Ads by</p><b class="text-blue-300">SpidyAds</b></div></a>
+  
         </div>
+        
+    </div>
+     <script>
+        let remainingSeconds = 35;
+        const el = document.getElementById('countdown');
+        function tick() { el.textContent = remainingSeconds; remainingSeconds--; if (remainingSeconds < 0) remainingSeconds = 20; }
+        tick();
+        setInterval(tick, 1000);
+    </script>
 
-        <!-- CTA -->
-        <div class="cta">
-
-            <a
-                href="https://t.me/+f3IK_vRwu8lmMTg1"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="button"
-                aria-label="Join Priya Toss Telegram">
-
-                <span>JOIN TELEGRAM FOR NEW UPDATES</span>
-
-                <i class="fa fa-telegram" aria-hidden="true"></i>
-
-            </a>
-
-        </div>
-
-        <!-- Features -->
-        <div class="features">
-
-            <div class="feature">
-                <strong>🏏 Updates</strong>
-                <span>Match news</span>
-            </div>
-
-            <div class="feature">
-                <strong>📊 Analysis</strong>
-                <span>Game insights</span>
-            </div>
-
-            <div class="feature">
-                <strong>⚡ Fast</strong>
-                <span>Quick updates</span>
-            </div>
-
-        </div>
-
-        <!-- Disclaimer -->
-        <div class="disclaimer">
-            Disclaimer: This channel shares cricket updates, analysis,
-            and general information for fans. It does not promote betting
-            or gambling. No outcomes are guaranteed. Please verify
-            information independently and act responsibly.
-        </div>
-
-        <!-- Ads -->
-        <a
-            href="https://t.me/SPIDYADSAGENCY"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="ads-by">
-
-            <span>Ads by</span>
-            <b>SpidyAds</b>
-
-        </a>
-
-    </section>
-
-</main>
-
-<script>
-    const countdownEl = document.getElementById("countdown");
-
-    let remainingSeconds = 35;
-
-    function updateCountdown() {
-
-        countdownEl.textContent =
-            String(remainingSeconds).padStart(2, "0");
-
-        remainingSeconds--;
-
-        if (remainingSeconds < 0) {
-            remainingSeconds = 35;
-        }
+      <script>
+document.addEventListener("DOMContentLoaded", function () {
+    function getCookie(name) {
+        var match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]+)'));
+        return match ? decodeURIComponent(match[1]) : null;
     }
 
-    updateCountdown();
+    var params = new URLSearchParams(window.location.search);
+    var fbclid = params.get("fbclid");
 
-    setInterval(updateCountdown, 1000);
+    var buttons = document.querySelectorAll(".cta a.button");
+    buttons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            try {
+                var url = new URL(btn.href, window.location.origin);
+                var fbp = getCookie("_fbp");
+                var fbc = getCookie("_fbc");
+
+                if (fbclid && !url.searchParams.has("fbclid")) {
+                    url.searchParams.set("fbclid", fbclid);
+                }
+                if (fbp && !url.searchParams.has("fbp")) {
+                    url.searchParams.set("fbp", fbp);
+                }
+                if (fbc && !url.searchParams.has("fbc")) {
+                    url.searchParams.set("fbc", fbc);
+                }
+                btn.href = url.toString();
+            } catch (err) {
+                console.error("JoinTrack parameter error:", err);
+            }
+        });
+    });
+});
 </script>
 
+
+
+
+
+
 </body>
+
 </html>
