@@ -1,7 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Toss King Mahi — Free Cricket Updates on Telegram</title>
+<meta name="description" content="Free daily cricket match analysis, toss updates and pitch reports. Join the Toss King Mahi Telegram channel." />
+<meta name="theme-color" content="#04070d" />
+<meta property="og:title" content="Toss King Mahi — Free Cricket Updates" />
+<meta property="og:description" content="Match analysis • Toss updates • Pitch reports — free on Telegram." />
+<meta property="og:type" content="website" />
 
 <!-- Meta Pixel Code -->
 <script>
@@ -13,315 +20,324 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '3459633347530745');
+fbq('init', '1650416203449749');
 fbq('track', 'PageView');
 </script>
 <noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=3459633347530745&ev=PageView&noscript=1"
+src="https://www.facebook.com/tr?id=1650416203449749&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
 
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Toss King Mahi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+<style>
+:root{
+  --bg:#04070d;
+  --green:#22c55e;
+  --green-soft:rgba(34,197,94,.15);
+  --gold:#fbbf24;
+  --tg1:#2aa9e0;
+  --tg2:#0f7ab5;
+  --text:#e5e7eb;
+  --line:rgba(255,255,255,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+html,body{min-height:100%;}
+body{
+  background:
+    radial-gradient(900px 520px at 18% -8%, rgba(34,197,94,.16), transparent 60%),
+    radial-gradient(760px 460px at 88% -4%, rgba(34,197,94,.10), transparent 60%),
+    linear-gradient(180deg,#04070d 0%,#06140d 60%,#04070d 100%);
+  color:var(--text);
+  overflow-x:hidden;
+}
+/* pitch stripes */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 60px, transparent 60px 120px);
+  -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,.9), transparent 75%);
+  mask-image:linear-gradient(180deg, rgba(0,0,0,.9), transparent 75%);
+}
+/* stadium scene: floodlights + floating balls */
+.scene{position:fixed;inset:0;overflow:hidden;pointer-events:none;}
+.flood{
+  position:absolute;top:-30px;width:46vw;height:78vh;
+  background:linear-gradient(180deg, rgba(255,255,240,.14), rgba(255,255,240,0) 75%);
+  clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);
+  filter:blur(4px);transform-origin:top center;
+}
+.flood.l{left:-6vw;transform:rotate(14deg);animation:flick 6s ease-in-out infinite;}
+.flood.r{right:-6vw;transform:rotate(-14deg);animation:flick 6s ease-in-out infinite 2.5s;}
+@keyframes flick{0%,100%{opacity:.5}50%{opacity:.9}}
+.ball{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(circle at 32% 30%, #ef6a5a, #b91c1c 55%, #5f0f0f);
+  box-shadow:inset -6px -8px 14px rgba(0,0,0,.55), 0 10px 30px rgba(185,28,28,.25);
+}
+.ball::after{
+  content:"";position:absolute;left:50%;top:10%;bottom:10%;width:2px;margin-left:-1px;
+  background:repeating-linear-gradient(180deg,#fde8c8 0 5px, transparent 5px 10px);
+  transform:rotate(18deg);
+}
+.b1{width:46px;height:46px;top:22%;left:8%;animation:drift 16s ease-in-out infinite alternate;}
+.b2{width:30px;height:30px;bottom:18%;right:9%;animation:drift 20s ease-in-out infinite alternate-reverse;}
+@keyframes drift{from{transform:translateY(0) rotate(0)}to{transform:translateY(-64px) rotate(240deg)}}
 
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-    <style>
-        :root {
-            --primary: #6d320e;
-            --secondary: #0a3a49;
-            --accent: #9a2910;
-            --bg: #020617;
-            --text: #e5e7eb;
-        }
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;}
+@media(max-width:640px){.hero{padding:20px 14px 110px;}}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
+.card{
+  position:relative;max-width:520px;width:100%;text-align:center;overflow:hidden;
+  background:rgba(255,255,255,.06);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--line);border-radius:26px;padding:0 22px 26px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);animation:cardIn .8s ease-out;
+}
+.card::before{
+  content:"";position:absolute;top:0;left:12%;right:12%;height:2px;
+  background:linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.wm{position:absolute;right:-30px;top:120px;font-size:130px;opacity:.05;transform:rotate(-18deg);pointer-events:none;}
+@keyframes cardIn{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:none}}
 
-        body {
-            background: radial-gradient(1200px 600px at top, var(--secondary), var(--bg));
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+/* broadcast ticker */
+.ticker{
+  overflow:hidden;margin:0 -22px 18px;padding:9px 0;
+  background:rgba(0,0,0,.28);border-bottom:1px solid var(--line);
+}
+.track{display:inline-flex;white-space:nowrap;animation:scrollX 18s linear infinite;}
+.group{display:inline-flex;gap:26px;padding-right:26px;}
+.group span{
+  font-size:11.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#86efac;
+}
+@keyframes scrollX{to{transform:translateX(-50%)}}
 
-        .bg-blur {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-        }
+.badge{
+  display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;
+  background:var(--green-soft);border:1px solid rgba(34,197,94,.35);color:#86efac;
+  font-size:12.5px;font-weight:600;letter-spacing:.4px;margin-bottom:16px;
+}
+.dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:ping 1.6s infinite;}
+@keyframes ping{70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
 
-        .bg-blur span {
-            position: absolute;
-            width: 280px;
-            height: 280px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            filter: blur(120px);
-            opacity: .35;
-            animation: float 12s infinite alternate ease-in-out;
-        }
+.avatar{
+  width:118px;height:118px;margin:0 auto 14px;border-radius:50%;padding:3px;
+  background:conic-gradient(from 0deg, var(--gold), #b45309, var(--gold));
+  animation:imgFade .9s ease-out;
+}
+.avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;border:3px solid #0b1220;}
+@keyframes imgFade{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
 
-        .bg-blur span:nth-child(1) {
-            top: 10%;
-            left: 5%;
-        }
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,11vw,54px);letter-spacing:2px;line-height:1.05;margin-bottom:10px;}
+h1 .gold{color:var(--gold);text-shadow:0 0 24px rgba(251,191,36,.4);}
+.sub{
+  display:inline-block;font-size:13.5px;font-weight:600;letter-spacing:.3px;color:#fde68a;
+  background:rgba(251,191,36,.10);border:1px solid rgba(251,191,36,.3);
+  padding:6px 14px;border-radius:999px;margin-bottom:16px;
+}
 
-        .bg-blur span:nth-child(2) {
-            bottom: 15%;
-            right: 10%;
-            animation-delay: 3s;
-        }
+/* scoreboard countdown */
+.match-timer{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:14px;
+  padding:10px 14px;margin-bottom:18px;
+}
+.match-timer span{font-size:12px;letter-spacing:1.5px;color:#cbd5e1;font-weight:600;}
+.match-timer b{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:26px;letter-spacing:2px;color:var(--gold);min-width:78px;}
+.match-timer.live b{color:#f87171;}
 
-        @keyframes float {
-            from {
-                transform: translateY(0)
-            }
+.features{list-style:none;display:grid;gap:10px;margin-bottom:20px;text-align:left;}
+.features li{
+  display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:14px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  font-size:14px;font-weight:600;
+}
+.features li > div{flex:1;}
+.features small{display:block;font-weight:400;font-size:12px;opacity:.65;margin-top:2px;}
+.features .ic{
+  flex:0 0 36px;width:36px;height:36px;display:grid;place-items:center;border-radius:10px;
+  background:var(--green-soft);color:#4ade80;font-size:16px;
+}
 
-            to {
-                transform: translateY(-60px)
-            }
-        }
+a.button{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;
+  padding:16px 22px;border-radius:16px;
+  background:linear-gradient(135deg, var(--tg1), var(--tg2));
+  color:#fff;font-weight:800;font-size:16px;letter-spacing:.3px;text-decoration:none;
+  border:2px solid rgba(255,255,255,.85);
+  transition:transform .25s ease, box-shadow .25s ease;
+  animation:btnPulse 2.4s ease-in-out infinite;
+}
+a.button:hover{transform:translateY(-3px);box-shadow:0 24px 50px rgba(34,158,217,.5);animation:none;}
+@keyframes btnPulse{0%,100%{box-shadow:0 16px 36px rgba(34,158,217,.30)}50%{box-shadow:0 16px 46px rgba(34,158,217,.55)}}
 
-        .hero {
-            position: relative;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
+.micro{margin-top:12px;font-size:12.5px;color:#a7f3d0;display:flex;justify-content:center;gap:14px;flex-wrap:wrap;}
+.micro i{margin-right:5px;}
+.members{margin-top:10px;font-size:13px;color:#bbf7d0;display:flex;align-items:center;justify-content:center;gap:8px;}
+.members i{color:#4ade80;}
 
-        .card {
-            max-width: 520px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 28px;
-            padding: 36px 28px 32px;
-            text-align: center;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, .45);
-            animation: cardIn .9s ease-out;
-        }
+.disclaimer{
+  margin-top:18px;padding-top:14px;border-top:1px dashed rgba(255,255,255,.22);
+  font-size:11.5px;line-height:1.65;opacity:.7;text-align:left;
+}
+.credit{margin-top:14px;display:flex;justify-content:center;align-items:center;gap:6px;font-size:12px;color:#9ca3af;text-decoration:none;}
+.credit b{color:#93c5fd;}
+.credit:hover{text-decoration:underline;}
 
-        @keyframes cardIn {
-            from {
-                opacity: 0;
-                transform: translateY(40px) scale(.96)
-            }
+/* sticky mobile CTA */
+.sticky{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;align-items:center;gap:12px;
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(4,7,13,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);
+}
+.sticky-txt{display:flex;flex-direction:column;line-height:1.25;flex:1;}
+.sticky-txt b{font-size:14px;}
+.sticky-txt span{font-size:11.5px;color:#86efac;}
+.sticky-btn{width:auto;padding:11px 16px;border-radius:12px;font-size:13.5px;animation:none;}
+@media(max-width:640px){.sticky{display:flex;}}
 
-            to {
-                opacity: 1;
-                transform: none
-            }
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 999px;
-            background: rgba(34, 197, 94, .15);
-            color: #86efac;
-            font-size: 13px;
-            margin-bottom: 16px;
-        }
-
-        /* Center circular image on top */
-        .card .heading-img {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px;
-            border-radius: 50%;
-            display: block;
-            object-fit: cover;
-            animation: imgFade 1s ease-out;
-        }
-
-        @keyframes imgFade {
-            from {
-                opacity: 0;
-                transform: translateY(-20px)
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0)
-            }
-        }
-
-        h1 {
-            font-size: 40px;
-            line-height: 1.1;
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-
-        .sub {
-            font-size: 15px;
-            opacity: .85;
-            margin-bottom: 26px;
-            /* font-style:italic; */
-            background-color: yellow;
-            border-radius:4px;
-            border:1px solid black;
-            padding:4px 0px ;
-            color:black;
-            padding:0px 2px;
-            font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-        }
-
-        .timer {
-            font-size: 14px;
-            margin-bottom: 18px;
-        }
-
-        .timer span {
-            font-weight: 700;
-            color: #86efac;
-            font-size: 18px;
-        }
-
-        .cta {
-            display: flex;
-            justify-content: center;
-        }
-
-        a.button {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 16px 26px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: #ffffff;
-            font-weight: 800;
-            text-decoration: none;
-            border: 2px solid white;
-            box-shadow: 0 20px 40px rgba(34, 197, 94, .45);
-            transform: translateZ(0);
-            transition: .3s ease;
-        }
-
-        a.button:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 28px 60px rgba(101, 13, 13, 0.65);
-        }
-
-        .note {
-            margin-top: 18px;
-            font-size: 13px;
-            opacity: .75;
-        }
-
-        .disclaimer {
-            margin-top: 22px;
-            padding-top: 16px;
-            border-top: 1px dashed rgba(255, 255, 255, .25);
-            font-size: 12px;
-            line-height: 1.6;
-            opacity: .75;
-        }
-
-        @media(max-width:480px) {
-            h1 {
-                font-size: 22px
-            }
-
-            .card {
-                padding: 30px 20px
-            }
-
-            .card .heading-img {
-                width: 100px;
-                height: 100px
-            }
-        }
-    </style>
+@media(max-width:480px){
+  .card{padding:0 18px 22px;border-radius:22px;}
+  .ticker{margin:0 -18px 16px;}
+  .group{gap:22px;padding-right:22px;}
+  .avatar{width:104px;height:104px;}
+  .match-timer b{font-size:22px;min-width:66px;}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;}}
+</style>
 </head>
 
 <body>
-    
-    <div class="hero">
-        <div class="bg-blur">
-            <span></span>
-            <span></span>
-        </div>
-        <div class="card">
-             <!-- Center circular image on top of heading -->
-            <img src="IMG_20261009_210955_165.jpg" alt="cricket Illustration" class="heading-img" style="border: 2px solid rgb(255, 221, 0);">
-            <h1>Toss King Mahi</h1>
-            <p class="sub">Accurate analysis • Match Update • Right Pred!ction</p>
-            <div class="timer">FREE JOINING ENDS IN <span id="countdown">30</span>s</div>
-            <div class="cta">
-                <a href="https://tg-join-tracker.lovable.app/go/mahiking" target="_blank"  class="button"  >JOIN TELEGRAM FOR NEW UPDATE <i
-                        class="fa fa-telegram"></i></a>
-            </div>
-  
-           
-            <div class="disclaimer">Disclaimer: This channel shares cricket updates, analysis, and general information
-                for fans. It does not promote betting or gambling. No outcomes are guaranteed. Please verify
-                independently and act responsibly.</div>
 
-                   <!--  my link -->    <a href="https://t.me/SPIDYADSAGENCY" class="" style="  text-decoration: none;  padding:4px 2px; display:flex; place-items:center; place-content:center; " > <div class=""  style="padding:4px 2px; display:flex; place-items:center; place-content:center; " ><p class="" style="color:white;  text-decoration: none; margin-right:4px; " >Ads by</p><b class="text-blue-300">SpidyAds</b></div></a>
-  
+<div class="scene" aria-hidden="true">
+  <div class="flood l"></div>
+  <div class="flood r"></div>
+  <div class="ball b1"></div>
+  <div class="ball b2"></div>
+</div>
+
+<div class="hero">
+  <main class="card">
+    <div class="wm" aria-hidden="true">🏏</div>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="track">
+        <div class="group">
+          <span>🏏 Toss Report</span><span>🏟️ Pitch Update</span><span>🌦️ Weather</span><span>📊 Match Analysis</span><span>⚡ Playing XI</span>
         </div>
-        
+        <div class="group">
+          <span>🏏 Toss Report</span><span>🏟️ Pitch Update</span><span>🌦️ Weather</span><span>📊 Match Analysis</span><span>⚡ Playing XI</span>
+        </div>
+      </div>
     </div>
-     <script>
-        let remainingSeconds = 35;
-        const el = document.getElementById('countdown');
-        function tick() { el.textContent = remainingSeconds; remainingSeconds--; if (remainingSeconds < 0) remainingSeconds = 20; }
-        tick();
-        setInterval(tick, 1000);
-    </script>
 
-      <script>
-document.addEventListener("DOMContentLoaded", function () {
-    function getCookie(name) {
-        var match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]+)'));
-        return match ? decodeURIComponent(match[1]) : null;
+    <div class="badge"><span class="dot"></span> FREE TELEGRAM CHANNEL — NO FEES</div>
+
+    <div class="avatar">
+      <img src="IMG_20261009_210955_165.jpg" alt="Toss King Mahi" width="118" height="118" />
+    </div>
+
+    <h1>Toss King <span class="gold">Mahi</span></h1>
+    <p class="sub">Match Analysis • Toss Updates • Pitch Reports</p>
+
+    <div class="match-timer" id="matchTimer">
+      <span id="timerTitle">NEXT MATCH IN</span>
+      <b id="countdown">--:--</b>
+    </div>
+
+    <ul class="features">
+      <li><span class="ic"><i class="fa fa-bolt"></i></span><div>Toss Update<small>Before every match begins</small></div></li>
+      <li><span class="ic"><i class="fa fa-line-chart"></i></span><div>Pitch &amp; Weather Report<small>Know the conditions early</small></div></li>
+      <li><span class="ic"><i class="fa fa-check-circle"></i></span><div>Daily Match Analysis<small>Simple, clear &amp; always free</small></div></li>
+    </ul>
+
+    <a class="button join-btn" href="https://tg-join-tracker.lovable.app/go/mahiking" target="_blank" rel="noopener">JOIN TELEGRAM FOR FREE <i class="fa fa-telegram"></i></a>
+
+    <div class="micro">
+      <span><i class="fa fa-check-circle"></i>Instant join</span>
+      <span><i class="fa fa-check-circle"></i>No fees</span>
+      <span><i class="fa fa-check-circle"></i>Leave anytime</span>
+    </div>
+
+    <!-- ✏️ Optional: replace with your REAL member count for stronger proof -->
+    <p class="members"><i class="fa fa-users"></i> Join thousands of cricket fans already inside</p>
+
+    <div class="disclaimer">Disclaimer: This channel shares cricket updates, analysis, and general information for fans. It does not promote betting or gambling. No outcomes are guaranteed. Please verify independently and act responsibly.</div>
+
+    <a class="credit" href="https://t.me/SPIDYADSAGENCY" target="_blank" rel="noopener">Ads by <b>SpidyAds</b></a>
+  </main>
+</div>
+
+<div class="sticky">
+  <div class="sticky-txt"><b>Toss King Mahi</b><span>Free Telegram channel</span></div>
+  <a class="button join-btn sticky-btn" href="https://tg-join-tracker.lovable.app/go/mahiking" target="_blank" rel="noopener">JOIN FREE <i class="fa fa-telegram"></i></a>
+</div>
+
+<script>
+/* ✏️ Set the REAL start time of today's match (24-hour format, e.g. "19:30" = 7:30 PM).
+   Leave "" to hide the timer. Updates every second and switches to "LIVE" once time passes. */
+(function () {
+  var MATCH_TIME = "19:30";
+  var box = document.getElementById('matchTimer');
+  if (!box) return;
+  if (!MATCH_TIME) { box.style.display = 'none'; return; }
+
+  var label = document.getElementById('countdown');
+  var title = document.getElementById('timerTitle');
+  function pad(n){ return n < 10 ? '0' + n : '' + n; }
+  function tick() {
+    var p = MATCH_TIME.split(':');
+    var now = new Date();
+    var target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), +p[0], +p[1], 0);
+    var diff = target - now;
+    if (diff <= 0) {
+      box.classList.add('live');
+      title.textContent = "MATCH IS";
+      label.textContent = "LIVE";
+      clearInterval(iv);
+      return;
     }
+    var h = Math.floor(diff / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+    label.textContent = (h > 0 ? pad(h) + ':' : '') + pad(m) + ':' + pad(s);
+  }
+  tick();
+  var iv = setInterval(tick, 1000);
+})();
+</script>
 
-    var params = new URLSearchParams(window.location.search);
-    var fbclid = params.get("fbclid");
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  function getCookie(name) {
+    var match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[1]) : null;
+  }
 
-    var buttons = document.querySelectorAll(".cta a.button");
-    buttons.forEach(function (btn) {
-        btn.addEventListener("click", function () {
-            try {
-                var url = new URL(btn.href, window.location.origin);
-                var fbp = getCookie("_fbp");
-                var fbc = getCookie("_fbc");
+  var params = new URLSearchParams(window.location.search);
+  var fbclid = params.get("fbclid");
 
-                if (fbclid && !url.searchParams.has("fbclid")) {
-                    url.searchParams.set("fbclid", fbclid);
-                }
-                if (fbp && !url.searchParams.has("fbp")) {
-                    url.searchParams.set("fbp", fbp);
-                }
-                if (fbc && !url.searchParams.has("fbc")) {
-                    url.searchParams.set("fbc", fbc);
-                }
-                btn.href = url.toString();
-            } catch (err) {
-                console.error("JoinTrack parameter error:", err);
-            }
-        });
+  document.querySelectorAll(".join-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      // Fire a Meta conversion event so campaigns can optimise for real joins
+      if (typeof fbq === "function") fbq('track', 'Contact');
+      try {
+        var url = new URL(btn.href, window.location.origin);
+        var fbp = getCookie("_fbp");
+        var fbc = getCookie("_fbc");
+        if (fbclid && !url.searchParams.has("fbclid")) url.searchParams.set("fbclid", fbclid);
+        if (fbp && !url.searchParams.has("fbp")) url.searchParams.set("fbp", fbp);
+        if (fbc && !url.searchParams.has("fbc")) url.searchParams.set("fbc", fbc);
+        btn.href = url.toString();
+      } catch (err) {
+        console.error("JoinTrack parameter error:", err);
+      }
     });
+  });
 });
 </script>
 
-
-
-
-
-
 </body>
-
 </html>
