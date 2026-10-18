@@ -134,6 +134,139 @@
     }
     .icon-btn svg { width: 18px; height: 18px; }
 
+    /* ---------- Telegram button (top bar) ---------- */
+    .tg-btn {
+        background: linear-gradient(135deg, #2aabee 0%, #229ed9 100%);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+        padding: 7px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        box-shadow: 0 4px 14px rgba(34, 158, 217, 0.35);
+    }
+    .tg-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(34, 158, 217, 0.5);
+    }
+    .tg-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* ---------- Telegram popup ---------- */
+    .tg-popup-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        background: rgba(0,0,0,0.78);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    .tg-popup-backdrop.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .tg-popup {
+        background: linear-gradient(160deg, #1c2530 0%, #0e1620 100%);
+        border: 1px solid rgba(42, 171, 238, 0.4);
+        border-radius: 18px;
+        padding: 32px 28px 26px;
+        max-width: 380px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(42, 171, 238, 0.15);
+        transform: scale(0.92) translateY(8px);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+    }
+    .tg-popup-backdrop.show .tg-popup { transform: scale(1) translateY(0); }
+    .tg-popup-icon {
+        width: 68px;
+        height: 68px;
+        margin: 0 auto 16px;
+        background: linear-gradient(135deg, #2aabee 0%, #229ed9 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px rgba(42, 171, 238, 0.4);
+        animation: tgBounce 2.2s ease-in-out infinite;
+    }
+    @keyframes tgBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+    .tg-popup-icon svg { width: 38px; height: 38px; fill: #fff; }
+    .tg-popup-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 8px;
+    }
+    .tg-popup-subtitle {
+        font-size: 14px;
+        color: rgba(255,255,255,0.65);
+        margin: 0 0 22px;
+        line-height: 1.5;
+    }
+    .tg-popup-join {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #2aabee 0%, #229ed9 100%);
+        color: #fff;
+        text-decoration: none;
+        padding: 13px 28px;
+        border-radius: 999px;
+        font-size: 15px;
+        font-weight: 700;
+        width: 100%;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+        box-shadow: 0 6px 20px rgba(42, 171, 238, 0.4);
+    }
+    .tg-popup-join:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(42, 171, 238, 0.55);
+    }
+    .tg-popup-join svg { width: 18px; height: 18px; fill: currentColor; }
+    .tg-popup-close {
+        margin-top: 14px;
+        background: transparent;
+        border: none;
+        color: rgba(255,255,255,0.5);
+        font-size: 13px;
+        cursor: pointer;
+        padding: 8px 14px;
+        border-radius: 8px;
+        transition: color 0.2s ease;
+    }
+    .tg-popup-close:hover { color: #fff; }
+    .tg-popup-reminder {
+        margin-top: 6px;
+        font-size: 11px;
+        color: rgba(255,255,255,0.4);
+    }
+    @media (max-width: 600px) {
+        .tg-btn span.tg-label { display: none; }
+        .tg-btn { padding: 7px; }
+        .tg-btn svg { width: 18px; height: 18px; }
+        .tg-popup { padding: 26px 22px 22px; }
+        .tg-popup-title { font-size: 18px; }
+    }
+
     /* ---------- Custom loading spinner ---------- */
     .custom-spinner {
         position: absolute;
@@ -565,6 +698,10 @@
                 <span class="channel-title" id="channelTitle">Live Stream</span>
             </div>
             <div class="top-right">
+                <a class="tg-btn" id="tgTopBtn" href="https://t.me/+Q0WcMIjAalcyNTU1" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24"><path d="M23.054 4.193a1.5 1.5 0 0 0-1.612-.236L2.314 11.476c-.92.36-1.394 1.354-1.108 2.287.276.9 1.122 1.482 2.055 1.39l4.55-.348-.92 4.283c-.115.534.063 1.09.467 1.454.404.364.974.497 1.49.346l3.246-1.182 3.07 2.224c.272.197.6.3.933.3.146 0 .293-.02.437-.062.49-.145.87-.526 1.026-1.018l5.276-13.32a1.5 1.5 0 0 0-.826-1.923zM10.3 14.94l-.42 4.18.92-4.27 6.05-6.05-6.55 6.14z"/></svg>
+                    <span class="tg-label">Join Telegram</span>
+                </a>
                 <span class="buffer-pill" id="bufferPill"><span class="dot"></span><span id="bufferText">0.0s</span></span>
                 <button class="icon-btn" id="screenshotBtn" title="Screenshot (S)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -711,6 +848,23 @@
 
         <!-- Screenshot flash -->
         <div class="flash" id="flash"></div>
+
+        <!-- Telegram popup (shows on every page open) -->
+        <div class="tg-popup-backdrop" id="tgPopupBackdrop">
+            <div class="tg-popup">
+                <div class="tg-popup-icon">
+                    <svg viewBox="0 0 24 24"><path d="M23.054 4.193a1.5 1.5 0 0 0-1.612-.236L2.314 11.476c-.92.36-1.394 1.354-1.108 2.287.276.9 1.122 1.482 2.055 1.39l4.55-.348-.92 4.283c-.115.534.063 1.09.467 1.454.404.364.974.497 1.49.346l3.246-1.182 3.07 2.224c.272.197.6.3.933.3.146 0 .293-.02.437-.062.49-.145.87-.526 1.026-1.018l5.276-13.32a1.5 1.5 0 0 0-.826-1.923zM10.3 14.94l-.42 4.18.92-4.27 6.05-6.05-6.55 6.14z"/></svg>
+                </div>
+                <h2 class="tg-popup-title">Join Our Telegram</h2>
+                <p class="tg-popup-subtitle">Stay updated with the latest live streams, announcements, and community discussions. Tap below to join the channel now!</p>
+                <a class="tg-popup-join" href="https://t.me/+Q0WcMIjAalcyNTU1" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24"><path d="M23.054 4.193a1.5 1.5 0 0 0-1.612-.236L2.314 11.476c-.92.36-1.394 1.354-1.108 2.287.276.9 1.122 1.482 2.055 1.39l4.55-.348-.92 4.283c-.115.534.063 1.09.467 1.454.404.364.974.497 1.49.346l3.246-1.182 3.07 2.224c.272.197.6.3.933.3.146 0 .293-.02.437-.062.49-.145.87-.526 1.026-1.018l5.276-13.32a1.5 1.5 0 0 0-.826-1.923zM10.3 14.94l-.42 4.18.92-4.27 6.05-6.05-6.55 6.14z"/></svg>
+                    Join Channel
+                </a>
+                <button class="tg-popup-close" id="tgPopupClose">Maybe later</button>
+                <div class="tg-popup-reminder">This popup appears each time you open the page</div>
+            </div>
+        </div>
 
         <!-- Hidden canvas for screenshots -->
         <canvas id="snapCanvas" style="display:none"></canvas>
@@ -1273,6 +1427,37 @@
             kbdHint.classList.remove("show");
         }
     });
+
+    // ============ TELEGRAM POPUP ============
+    const tgPopupBackdrop = $("tgPopupBackdrop");
+    const tgPopupClose = $("tgPopupClose");
+    const tgTopBtn = $("tgTopBtn");
+
+    function showTelegramPopup() {
+        if (tgPopupBackdrop) tgPopupBackdrop.classList.add("show");
+    }
+    function hideTelegramPopup() {
+        if (tgPopupBackdrop) tgPopupBackdrop.classList.remove("show");
+    }
+
+    if (tgPopupClose) {
+        tgPopupClose.addEventListener("click", hideTelegramPopup);
+    }
+    if (tgPopupBackdrop) {
+        // Close when clicking outside the popup card
+        tgPopupBackdrop.addEventListener("click", (e) => {
+            if (e.target === tgPopupBackdrop) hideTelegramPopup();
+        });
+        // Close on Escape
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && tgPopupBackdrop.classList.contains("show")) {
+                hideTelegramPopup();
+            }
+        });
+    }
+
+    // Show popup on every page open (small delay so it appears after first paint)
+    setTimeout(showTelegramPopup, 800);
 
     // ============ BOOT ============
     document.addEventListener("shaka-ui-loaded", () => {
