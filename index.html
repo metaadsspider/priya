@@ -439,26 +439,6 @@
         box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
     }
 
-    /* Adblock warning banner */
-    .adblock-banner {
-        position: absolute;
-        top: 60px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 35;
-        background: rgba(239, 68, 68, 0.95);
-        color: #fff;
-        padding: 8px 18px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 600;
-        display: none;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
-    }
-    .adblock-banner.show { display: flex; }
-
     /* Center play overlay (for click-to-play) */
     .center-play {
         position: absolute;
@@ -607,14 +587,6 @@
             </div>
         </div>
 
-        <!-- Adblock warning banner -->
-        <div class="adblock-banner" id="adblockBanner">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                <path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-            </svg>
-            Ad blocker detected — please disable to support this stream
-        </div>
-
         <!-- Toasts -->
         <div class="toast-container" id="toastContainer"></div>
 
@@ -754,10 +726,8 @@
     const CLEAR_KEYS = {
         "c4e6bd30698f91c0d1e99e505d8859c7": "cea8ba61e532c7143c630f0c9becd7a6"
     };
-    const AD_LOAD_DELAY_MS = 10000;
 
     // ============ STATE ============
-    let adInitialized = false;
     let player = null;
     let ui = null;
     let controls = null;
@@ -806,7 +776,6 @@
     const retryBtn = $("retryBtn");
     const flash = $("flash");
     const snapCanvas = $("snapCanvas");
-    const adblockBanner = $("adblockBanner");
     const channelTitle = $("channelTitle");
 
     // ============ TOAST ============
@@ -1188,51 +1157,11 @@
         else if (category === 4) { title = "DRM Error"; msg = "There was a problem decrypting the stream content."; }
         else if (category === 5 || category === 6 || category === 7) { title = "Streaming Error"; msg = "The streaming server returned an error. Retrying shortly…"; }
         else if (category === 9) { title = "Manifest Error"; msg = "The stream manifest could not be loaded or parsed."; }
-        else if (category === 10) { title = "Ad Error"; msg = "An advertising error occurred. Stream continues."; }
         errorTitle.textContent = title;
         errorMsg.textContent = msg + (error && error.message ? ` (Code ${code})` : ` (Code ${code})`);
         errorOverlay.classList.add("show");
     }
     function hideError() { errorOverlay.classList.remove("show"); }
-
-    // ============ AD BLOCK DETECTION ============
-    function detectAdblock() {
-        const bait = document.createElement("div");
-        bait.className = "ad-banner ads ad-unit adsbox pub_300x250 pub_300x250m pub_728x90 text-ad textAd";
-        bait.style.cssText = "position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;";
-        document.body.appendChild(bait);
-        setTimeout(() => {
-            if (bait.offsetParent === null || bait.offsetHeight === 0 || bait.clientHeight === 0) {
-                adblockBanner.classList.add("show");
-                setTimeout(() => adblockBanner.classList.remove("show"), 8000);
-            }
-            bait.remove();
-        }, 100);
-    }
-
-    // ============ AD SCRIPTS ============
-    function loadAdScripts() {
-        if (adInitialized) return;
-        adInitialized = true;
-
-        try {
-            console.log("Initializing ad script #1 (al5sm)");
-            (function(s){
-                s.dataset.zone = "11944641";
-                s.src = "https://al5sm.com/tag.min.js";
-            })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement("script")));
-        } catch (e) { console.warn("al5sm ad script failed:", e); }
-
-        try {
-            console.log("Initializing ad script #2 (matcheslinkz)");
-            const script2 = document.createElement("script");
-            script2.src = "https://matcheslinkz.pages.dev/mine-ad.js";
-            script2.async = true;
-            script2.onload = () => console.log("matcheslinkz loaded.");
-            script2.onerror = (err) => console.warn("matcheslinkz failed:", err);
-            document.head.appendChild(script2);
-        } catch (e) { console.warn("matcheslinkz failed:", e); }
-    }
 
     // ============ KEYBOARD SHORTCUTS ============
     document.addEventListener("keydown", (e) => {
@@ -1348,14 +1277,11 @@
     // ============ BOOT ============
     document.addEventListener("shaka-ui-loaded", () => {
         initPlayer();
-        detectAdblock();
     });
     document.addEventListener("shaka-ui-load-failed", () => {
         hideSpinner();
         showError({ code: 2001, message: "UI library failed to load" });
     });
-
-    setTimeout(loadAdScripts, AD_LOAD_DELAY_MS);
 
     // Periodic buffer health update
     setInterval(() => {
