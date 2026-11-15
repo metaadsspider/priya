@@ -1,1481 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="referrer" content="no-referrer">
-<title>Enhanced Live Stream Player</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.1/shaka-player.ui.min.js" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.1/controls.min.css" crossorigin="anonymous">
-
-<style>
-    :root {
-        --accent: #7c3aed;
-        --accent-2: #06b6d4;
-        --bg: #000;
-        --surface: rgba(15, 15, 20, 0.85);
-        --text: #fff;
-        --muted: rgba(255, 255, 255, 0.7);
-        --danger: #ef4444;
-        --success: #10b981;
-        --live: #ef4444;
-    }
-
-    * {
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        background: var(--bg);
-        color: var(--text);
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        overflow: hidden;
-        user-select: none;
-    }
-
-    .app-wrap {
-        position: relative;
-        width: 100vw;
-        height: 100vh;
-        background: radial-gradient(ellipse at center, #1a1a24 0%, #000 70%);
-    }
-
-    .video-container {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        background-color: #000;
-    }
-
-    /* ---------- Top bar ---------- */
-    .top-bar {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 30;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 18px;
-        background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
-        pointer-events: none;
-        opacity: 1;
-        transition: opacity 0.4s ease;
-    }
-    .top-bar.hidden { opacity: 0; pointer-events: none; }
-
-    .top-left, .top-right {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        pointer-events: auto;
-    }
-
-    .live-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        background: rgba(0,0,0,0.6);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid rgba(239, 68, 68, 0.5);
-        color: #fff;
-        padding: 5px 11px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 1.2px;
-    }
-    .live-dot {
-        width: 8px;
-        height: 8px;
-        background: var(--live);
-        border-radius: 50%;
-        box-shadow: 0 0 8px var(--live);
-        animation: pulse 1.6s ease-in-out infinite;
-    }
-    @keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.4; transform: scale(0.8); }
-    }
-
-    .channel-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: rgba(255,255,255,0.9);
-        text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-    }
-
-    .icon-btn {
-        background: rgba(0,0,0,0.55);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid rgba(255,255,255,0.12);
-        color: #fff;
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: 16px;
-    }
-    .icon-btn:hover {
-        background: var(--accent);
-        border-color: var(--accent);
-        transform: translateY(-1px);
-    }
-    .icon-btn svg { width: 18px; height: 18px; }
-
-    /* ---------- Telegram button (top bar) ---------- */
-    .tg-btn {
-        background: linear-gradient(135deg, #2aabee 0%, #229ed9 100%);
-        border: 1px solid rgba(255,255,255,0.2);
-        color: #fff;
-        padding: 7px 14px;
-        border-radius: 999px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        box-shadow: 0 4px 14px rgba(34, 158, 217, 0.35);
-    }
-    .tg-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(34, 158, 217, 0.5);
-    }
-    .tg-btn svg { width: 16px; height: 16px; fill: currentColor; }
-
-    /* ---------- Telegram popup ---------- */
-    .tg-popup-backdrop {
-        position: fixed;
-        inset: 0;
-        z-index: 1000;
-        background: rgba(0,0,0,0.78);
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-    }
-    .tg-popup-backdrop.show {
-        opacity: 1;
-        pointer-events: auto;
-    }
-    .tg-popup {
-        background: linear-gradient(160deg, #1c2530 0%, #0e1620 100%);
-        border: 1px solid rgba(42, 171, 238, 0.4);
-        border-radius: 18px;
-        padding: 32px 28px 26px;
-        max-width: 380px;
-        width: 100%;
-        text-align: center;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(42, 171, 238, 0.15);
-        transform: scale(0.92) translateY(8px);
-        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        position: relative;
-    }
-    .tg-popup-backdrop.show .tg-popup { transform: scale(1) translateY(0); }
-    .tg-popup-icon {
-        width: 68px;
-        height: 68px;
-        margin: 0 auto 16px;
-        background: linear-gradient(135deg, #2aabee 0%, #229ed9 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 24px rgba(42, 171, 238, 0.4);
-        animation: tgBounce 2.2s ease-in-out infinite;
-    }
-    @keyframes tgBounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-6px); }
-    }
-    .tg-popup-icon svg { width: 38px; height: 38px; fill: #fff; }
-    .tg-popup-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: #fff;
-        margin: 0 0 8px;
-    }
-    .tg-popup-subtitle {
-        font-size: 14px;
-        color: rgba(255,255,255,0.65);
-        margin: 0 0 22px;
-        line-height: 1.5;
-    }
-    .tg-popup-join {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        background: linear-gradient(135deg, #2aabee 0%, #229ed9 100%);
-        color: #fff;
-        text-decoration: none;
-        padding: 13px 28px;
-        border-radius: 999px;
-        font-size: 15px;
-        font-weight: 700;
-        width: 100%;
-        box-sizing: border-box;
-        transition: all 0.2s ease;
-        box-shadow: 0 6px 20px rgba(42, 171, 238, 0.4);
-    }
-    .tg-popup-join:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 28px rgba(42, 171, 238, 0.55);
-    }
-    .tg-popup-join svg { width: 18px; height: 18px; fill: currentColor; }
-    .tg-popup-close {
-        margin-top: 14px;
-        background: transparent;
-        border: none;
-        color: rgba(255,255,255,0.5);
-        font-size: 13px;
-        cursor: pointer;
-        padding: 8px 14px;
-        border-radius: 8px;
-        transition: color 0.2s ease;
-    }
-    .tg-popup-close:hover { color: #fff; }
-    .tg-popup-reminder {
-        margin-top: 6px;
-        font-size: 11px;
-        color: rgba(255,255,255,0.4);
-    }
-    @media (max-width: 600px) {
-        .tg-btn span.tg-label { display: none; }
-        .tg-btn { padding: 7px; }
-        .tg-btn svg { width: 18px; height: 18px; }
-        .tg-popup { padding: 26px 22px 22px; }
-        .tg-popup-title { font-size: 18px; }
-    }
-
-    /* ---------- Custom loading spinner ---------- */
-    .custom-spinner {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 15;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-    }
-    .custom-spinner.hidden { opacity: 0; }
-    .spinner-ring {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        border: 3px solid rgba(255,255,255,0.15);
-        border-top-color: var(--accent);
-        border-right-color: var(--accent-2);
-        animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-    .spinner-text {
-        font-size: 12px;
-        color: var(--muted);
-        letter-spacing: 0.8px;
-        text-transform: uppercase;
-        font-weight: 500;
-    }
-
-    /* ---------- Hide default shaka spinner ---------- */
-    .shaka-spinner-container { display: none !important; }
-
-    /* ---------- Custom controls overlay ---------- */
-    .controls-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 25;
-        padding: 16px 18px 18px;
-        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 100%);
-        opacity: 1;
-        transition: opacity 0.4s ease;
-    }
-    .controls-overlay.hidden { opacity: 0; pointer-events: none; }
-
-    /* Seek bar */
-    .seek-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 10px;
-    }
-    .seek-bar {
-        flex: 1;
-        position: relative;
-        height: 6px;
-        background: rgba(255,255,255,0.18);
-        border-radius: 999px;
-        cursor: pointer;
-        overflow: hidden;
-        transition: height 0.2s ease;
-    }
-    .seek-bar:hover { height: 9px; }
-    .seek-buffered {
-        position: absolute;
-        top: 0; left: 0; bottom: 0;
-        background: rgba(255,255,255,0.35);
-        border-radius: 999px;
-        width: 0%;
-        transition: width 0.2s ease;
-    }
-    .seek-played {
-        position: absolute;
-        top: 0; left: 0; bottom: 0;
-        background: linear-gradient(90deg, var(--accent), var(--accent-2));
-        border-radius: 999px;
-        width: 0%;
-        box-shadow: 0 0 12px rgba(124, 58, 237, 0.6);
-    }
-    .seek-thumb {
-        position: absolute;
-        top: 50%;
-        transform: translate(-50%, -50%) scale(0);
-        width: 14px;
-        height: 14px;
-        background: #fff;
-        border-radius: 50%;
-        box-shadow: 0 0 8px rgba(0,0,0,0.6);
-        transition: transform 0.2s ease;
-    }
-    .seek-bar:hover .seek-thumb { transform: translate(-50%, -50%) scale(1); }
-
-    .time-display {
-        font-size: 12px;
-        font-weight: 500;
-        color: rgba(255,255,255,0.9);
-        min-width: 110px;
-        text-align: right;
-        font-variant-numeric: tabular-nums;
-        letter-spacing: 0.5px;
-    }
-    .time-display .sep { color: rgba(255,255,255,0.4); margin: 0 6px; }
-
-    /* Buttons row */
-    .buttons-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .ctrl-btn {
-        background: transparent;
-        border: none;
-        color: #fff;
-        cursor: pointer;
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-    }
-    .ctrl-btn:hover {
-        background: rgba(255,255,255,0.12);
-        color: var(--accent-2);
-    }
-    .ctrl-btn svg { width: 20px; height: 20px; }
-    .ctrl-btn.active { color: var(--accent-2); }
-
-    .volume-wrap {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-    .volume-slider {
-        width: 0;
-        overflow: hidden;
-        transition: width 0.25s ease;
-    }
-    .volume-wrap:hover .volume-slider { width: 80px; }
-    .volume-slider input[type=range] {
-        width: 80px;
-        height: 4px;
-        -webkit-appearance: none;
-        appearance: none;
-        background: rgba(255,255,255,0.25);
-        border-radius: 999px;
-        outline: none;
-        margin: 0 6px;
-    }
-    .volume-slider input[type=range]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 12px;
-        height: 12px;
-        background: var(--accent-2);
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 0 6px rgba(6, 182, 212, 0.5);
-    }
-    .volume-slider input[type=range]::-moz-range-thumb {
-        width: 12px;
-        height: 12px;
-        background: var(--accent-2);
-        border-radius: 50%;
-        cursor: pointer;
-        border: none;
-    }
-
-    .spacer { flex: 1; }
-
-    /* Settings menu */
-    .settings-wrap { position: relative; }
-    .settings-menu {
-        position: absolute;
-        bottom: 50px;
-        right: 0;
-        background: rgba(15, 15, 20, 0.92);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 12px;
-        padding: 8px;
-        min-width: 200px;
-        display: none;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-    }
-    .settings-menu.show { display: block; animation: fadeUp 0.2s ease; }
-    @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .settings-title {
-        font-size: 11px;
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        padding: 6px 10px;
-        font-weight: 600;
-    }
-    .settings-item {
-        padding: 8px 10px;
-        font-size: 13px;
-        color: #fff;
-        cursor: pointer;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        transition: background 0.15s ease;
-    }
-    .settings-item:hover { background: rgba(255,255,255,0.08); }
-    .settings-item.selected { color: var(--accent-2); }
-    .settings-item.selected::after { content: "✓"; }
-
-    /* Toast notifications */
-    .toast-container {
-        position: absolute;
-        top: 70px;
-        right: 20px;
-        z-index: 50;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        pointer-events: none;
-    }
-    .toast {
-        background: rgba(15, 15, 20, 0.92);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-left: 3px solid var(--accent);
-        color: #fff;
-        padding: 10px 14px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 500;
-        box-shadow: 0 6px 24px rgba(0,0,0,0.5);
-        animation: slideIn 0.3s ease;
-        max-width: 280px;
-    }
-    .toast.success { border-left-color: var(--success); }
-    .toast.error { border-left-color: var(--danger); }
-    .toast.info { border-left-color: var(--accent-2); }
-    @keyframes slideIn {
-        from { opacity: 0; transform: translateX(20px); }
-        to { opacity: 1; transform: translateX(0); }
-    }
-    .toast.fade-out {
-        animation: slideOut 0.3s ease forwards;
-    }
-    @keyframes slideOut {
-        to { opacity: 0; transform: translateX(20px); }
-    }
-
-    /* Error overlay */
-    .error-overlay {
-        position: absolute;
-        inset: 0;
-        z-index: 40;
-        background: rgba(0,0,0,0.85);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        gap: 16px;
-        padding: 20px;
-        text-align: center;
-    }
-    .error-overlay.show { display: flex; }
-    .error-icon {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        background: rgba(239, 68, 68, 0.15);
-        color: var(--danger);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 32px;
-    }
-    .error-title { font-size: 18px; font-weight: 700; }
-    .error-msg { font-size: 13px; color: var(--muted); max-width: 420px; }
-    .retry-btn {
-        background: linear-gradient(135deg, var(--accent), var(--accent-2));
-        color: #fff;
-        border: none;
-        padding: 11px 28px;
-        border-radius: 999px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: transform 0.15s ease, box-shadow 0.2s ease;
-    }
-    .retry-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
-    }
-
-    /* Center play overlay (for click-to-play) */
-    .center-play {
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 20;
-        width: 84px;
-        height: 84px;
-        background: rgba(0,0,0,0.5);
-        backdrop-filter: blur(8px);
-        border-radius: 50%;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: transform 0.2s ease, opacity 0.3s ease;
-    }
-    .center-play.show { display: flex; }
-    .center-play:hover { transform: translate(-50%, -50%) scale(1.08); background: var(--accent); }
-
-    /* Buffer health pill */
-    .buffer-pill {
-        background: rgba(0,0,0,0.55);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(255,255,255,0.12);
-        color: #fff;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 11px;
-        font-weight: 600;
-        font-variant-numeric: tabular-nums;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .buffer-pill .dot {
-        width: 6px; height: 6px;
-        background: var(--success);
-        border-radius: 50%;
-    }
-    .buffer-pill.low .dot { background: #f59e0b; }
-    .buffer-pill.crit .dot { background: var(--danger); }
-
-    /* Keyboard shortcut hint */
-    .kbd-hint {
-        position: absolute;
-        bottom: 90px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 22;
-        background: rgba(0,0,0,0.75);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 12px;
-        padding: 14px 18px;
-        font-size: 12px;
-        color: var(--muted);
-        display: none;
-        gap: 16px;
-        flex-wrap: wrap;
-        justify-content: center;
-        max-width: 90vw;
-    }
-    .kbd-hint.show { display: flex; }
-    .kbd-hint kbd {
-        background: rgba(255,255,255,0.12);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 4px;
-        padding: 2px 7px;
-        font-family: monospace;
-        font-size: 11px;
-        color: #fff;
-        margin-right: 4px;
-    }
-    .kbd-group { display: flex; align-items: center; gap: 4px; }
-
-    /* Hide shaka's native controls when our overlay is active */
-    .shaka-controls-container { display: none !important; }
-
-    /* Video fills container */
-    video {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: contain;
-        background: #000;
-    }
-
-    /* Screenshot flash */
-    .flash {
-        position: absolute;
-        inset: 0;
-        background: #fff;
-        opacity: 0;
-        pointer-events: none;
-        z-index: 60;
-    }
-    .flash.fire { animation: flashAnim 0.4s ease-out; }
-    @keyframes flashAnim {
-        0% { opacity: 0.8; }
-        100% { opacity: 0; }
-    }
-
-    @media (max-width: 600px) {
-        .top-bar { padding: 10px 12px; }
-        .controls-overlay { padding: 12px 12px 14px; }
-        .channel-title { display: none; }
-        .icon-btn { width: 34px; height: 34px; }
-        .time-display { min-width: 90px; font-size: 11px; }
-        .ctrl-btn { width: 36px; height: 36px; }
-        .volume-wrap { display: none; }
-        .buffer-pill { display: none; }
-    }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{width:100%;height:100%;background:#0a0a0a;overflow:hidden;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+    #player-container{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center}
+    video{width:100%;height:100%;object-fit:contain;background:#000}
+    #status{position:fixed;top:max(16px,env(safe-area-inset-top));right:16px;z-index:9997;display:flex;align-items:center;gap:7px;padding:6px 15px 6px 11px;background:rgba(10,10,10,.88);border:1px solid rgba(255,255,255,.07);font-size:11.5px;font-weight:500;letter-spacing:.2px;border-radius:24px;pointer-events:none;opacity:0;transition:opacity .25s ease,transform .25s ease;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);white-space:nowrap;box-shadow:0 2px 14px rgba(0,0,0,.45);color:#c0c0c0}
+    #status.show{opacity:1;transform:translateY(0)}
+    .st-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;background:#60a5fa}
+    #status.live .st-dot{background:#22d3a0;animation:dot-pulse 2s ease-in-out infinite}
+    #status.warn .st-dot{background:#fb923c;animation:dot-pulse 1s ease-in-out infinite}
+    #status.err .st-dot{background:#f87171}
+    @keyframes dot-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.55)}}
+    .sp-fit-btn{background:transparent!important;border:none!important;cursor:pointer!important;padding:0 7px!important;min-width:auto!important;opacity:.75;display:flex;align-items:center;justify-content:center;height:100%;transition:opacity .15s;color:#fff!important}
+    .sp-fit-btn:hover{opacity:1}
+    .fit-pill{font-size:10px;font-weight:700;letter-spacing:.4px;padding:3px 7px;border-radius:4px;line-height:1;border:1.5px solid rgba(255,255,255,.28);color:rgba(255,255,255,.8);pointer-events:none;white-space:nowrap;transition:border-color .2s,color .2s}
+    .sp-fit-btn:hover .fit-pill{border-color:rgba(255,255,255,.55);color:#fff}
+    .sp-fit-btn.mode-fill .fit-pill{border-color:#38bdf8;color:#38bdf8}
+    .sp-fit-btn.mode-cover .fit-pill{border-color:#a78bfa;color:#a78bfa}
+    .shaka-controls-container button{color:#fff!important}
+    .shaka-video-container{background-color:#000!important}
+    @media(max-width:380px){.fit-pill{font-size:9px;padding:2px 5px}}
+  </style>
 </head>
-
 <body>
-<div class="app-wrap">
-    <div class="video-container">
 
-        <!-- Top bar -->
-        <div class="top-bar" id="topBar">
-            <div class="top-left">
-                <span class="live-badge"><span class="live-dot"></span>LIVE</span>
-                <span class="channel-title" id="channelTitle">Live Stream</span>
-            </div>
-            <div class="top-right">
-                <a class="tg-btn" id="tgTopBtn" href="https://t.me/+Q0WcMIjAalcyNTU1" target="_blank" rel="noopener noreferrer">
-                    <svg viewBox="0 0 24 24"><path d="M23.054 4.193a1.5 1.5 0 0 0-1.612-.236L2.314 11.476c-.92.36-1.394 1.354-1.108 2.287.276.9 1.122 1.482 2.055 1.39l4.55-.348-.92 4.283c-.115.534.063 1.09.467 1.454.404.364.974.497 1.49.346l3.246-1.182 3.07 2.224c.272.197.6.3.933.3.146 0 .293-.02.437-.062.49-.145.87-.526 1.026-1.018l5.276-13.32a1.5 1.5 0 0 0-.826-1.923zM10.3 14.94l-.42 4.18.92-4.27 6.05-6.05-6.55 6.14z"/></svg>
-                    <span class="tg-label">Join Telegram</span>
-                </a>
-                <span class="buffer-pill" id="bufferPill"><span class="dot"></span><span id="bufferText">0.0s</span></span>
-                <button class="icon-btn" id="screenshotBtn" title="Screenshot (S)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                        <circle cx="12" cy="13" r="4"/>
-                    </svg>
-                </button>
-                <button class="icon-btn" id="pipBtn" title="Picture-in-Picture (P)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="4" width="20" height="16" rx="2"/>
-                        <rect x="12" y="11" width="8" height="6" rx="1" fill="currentColor"/>
-                    </svg>
-                </button>
-                <button class="icon-btn" id="kbHintBtn" title="Keyboard shortcuts (?)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="6" width="20" height="12" rx="2"/>
-                        <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h12"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-
-        <!-- Toasts -->
-        <div class="toast-container" id="toastContainer"></div>
-
-        <!-- Custom spinner -->
-        <div class="custom-spinner" id="customSpinner">
-            <div class="spinner-ring"></div>
-            <div class="spinner-text" id="spinnerText">Loading stream…</div>
-        </div>
-
-        <!-- Center play button -->
-        <div class="center-play" id="centerPlay">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="#fff">
-                <path d="M8 5v14l11-7z"/>
-            </svg>
-        </div>
-
-        <!-- Keyboard hint -->
-        <div class="kbd-hint" id="kbdHint">
-            <div class="kbd-group"><kbd>Space</kbd>Play / Pause</div>
-            <div class="kbd-group"><kbd>F</kbd>Fullscreen</div>
-            <div class="kbd-group"><kbd>M</kbd>Mute</div>
-            <div class="kbd-group"><kbd>↑</kbd><kbd>↓</kbd>Volume</div>
-            <div class="kbd-group"><kbd>←</kbd><kbd>→</kbd>Seek ±10s</div>
-            <div class="kbd-group"><kbd>P</kbd>PiP</div>
-            <div class="kbd-group"><kbd>S</kbd>Screenshot</div>
-            <div class="kbd-group"><kbd>0</kbd>-<kbd>9</kbd>Jump %</div>
-            <div class="kbd-group"><kbd>?</kbd>Toggle this</div>
-        </div>
-
-        <!-- Video + Shaka container -->
-        <div data-shaka-player-container style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
-            <video autoplay muted playsinline webkit-playsinline data-shaka-player id="video"></video>
-        </div>
-
-        <!-- Custom controls overlay -->
-        <div class="controls-overlay" id="controlsOverlay">
-            <div class="seek-row">
-                <div class="seek-bar" id="seekBar">
-                    <div class="seek-buffered" id="seekBuffered"></div>
-                    <div class="seek-played" id="seekPlayed"></div>
-                    <div class="seek-thumb" id="seekThumb"></div>
-                </div>
-                <div class="time-display">
-                    <span id="currentTime">0:00</span>
-                    <span class="sep">/</span>
-                    <span id="duration">LIVE</span>
-                </div>
-            </div>
-            <div class="buttons-row">
-                <button class="ctrl-btn" id="playBtn" title="Play/Pause (Space)">
-                    <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                    <svg id="pauseIcon" style="display:none" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
-                </button>
-
-                <div class="volume-wrap">
-                    <button class="ctrl-btn" id="muteBtn" title="Mute (M)">
-                        <svg id="volHighIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-                        </svg>
-                        <svg id="volMuteIcon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                            <line x1="23" y1="9" x2="17" y2="15"/>
-                            <line x1="17" y1="9" x2="23" y2="15"/>
-                        </svg>
-                    </button>
-                    <div class="volume-slider">
-                        <input type="range" id="volumeRange" min="0" max="1" step="0.01" value="1">
-                    </div>
-                </div>
-
-                <button class="ctrl-btn" id="liveBtn" title="Jump to live edge">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="3"/>
-                        <path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.08 7.08 4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.08-7.08 4.24-4.24"/>
-                    </svg>
-                </button>
-
-                <div class="spacer"></div>
-
-                <div class="settings-wrap">
-                    <button class="ctrl-btn" id="settingsBtn" title="Settings">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="3"/>
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                        </svg>
-                    </button>
-                    <div class="settings-menu" id="settingsMenu">
-                        <div class="settings-title">Playback Speed</div>
-                        <div class="settings-item" data-speed="0.5">0.5×</div>
-                        <div class="settings-item selected" data-speed="1">1.0× Normal</div>
-                        <div class="settings-item" data-speed="1.25">1.25×</div>
-                        <div class="settings-item" data-speed="1.5">1.5×</div>
-                        <div class="settings-item" data-speed="2">2.0×</div>
-                        <div class="settings-title" style="margin-top:6px">Video Quality</div>
-                        <div class="settings-item selected" data-quality="auto">Auto</div>
-                        <div class="settings-item" data-quality="1080">1080p</div>
-                        <div class="settings-item" data-quality="720">720p</div>
-                        <div class="settings-item" data-quality="480">480p</div>
-                    </div>
-                </div>
-
-                <button class="ctrl-btn" id="fullscreenBtn" title="Fullscreen (F)">
-                    <svg id="fsEnterIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
-                    </svg>
-                    <svg id="fsExitIcon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-
-        <!-- Error overlay -->
-        <div class="error-overlay" id="errorOverlay">
-            <div class="error-icon">!</div>
-            <div class="error-title" id="errorTitle">Stream Error</div>
-            <div class="error-msg" id="errorMsg">An error occurred while loading the stream. Please try again.</div>
-            <button class="retry-btn" id="retryBtn">Retry Stream</button>
-        </div>
-
-        <!-- Screenshot flash -->
-        <div class="flash" id="flash"></div>
-
-        <!-- Telegram popup (shows on every page open) -->
-        <div class="tg-popup-backdrop" id="tgPopupBackdrop">
-            <div class="tg-popup">
-                <div class="tg-popup-icon">
-                    <svg viewBox="0 0 24 24"><path d="M23.054 4.193a1.5 1.5 0 0 0-1.612-.236L2.314 11.476c-.92.36-1.394 1.354-1.108 2.287.276.9 1.122 1.482 2.055 1.39l4.55-.348-.92 4.283c-.115.534.063 1.09.467 1.454.404.364.974.497 1.49.346l3.246-1.182 3.07 2.224c.272.197.6.3.933.3.146 0 .293-.02.437-.062.49-.145.87-.526 1.026-1.018l5.276-13.32a1.5 1.5 0 0 0-.826-1.923zM10.3 14.94l-.42 4.18.92-4.27 6.05-6.05-6.55 6.14z"/></svg>
-                </div>
-                <h2 class="tg-popup-title">Join Our Telegram</h2>
-                <p class="tg-popup-subtitle">Stay updated with the latest live streams, announcements, and community discussions. Tap below to join the channel now!</p>
-                <a class="tg-popup-join" href="https://t.me/+Q0WcMIjAalcyNTU1" target="_blank" rel="noopener noreferrer">
-                    <svg viewBox="0 0 24 24"><path d="M23.054 4.193a1.5 1.5 0 0 0-1.612-.236L2.314 11.476c-.92.36-1.394 1.354-1.108 2.287.276.9 1.122 1.482 2.055 1.39l4.55-.348-.92 4.283c-.115.534.063 1.09.467 1.454.404.364.974.497 1.49.346l3.246-1.182 3.07 2.224c.272.197.6.3.933.3.146 0 .293-.02.437-.062.49-.145.87-.526 1.026-1.018l5.276-13.32a1.5 1.5 0 0 0-.826-1.923zM10.3 14.94l-.42 4.18.92-4.27 6.05-6.05-6.55 6.14z"/></svg>
-                    Join Channel
-                </a>
-                <button class="tg-popup-close" id="tgPopupClose">Maybe later</button>
-                <div class="tg-popup-reminder">This popup appears each time you open the page</div>
-            </div>
-        </div>
-
-        <!-- Hidden canvas for screenshots -->
-        <canvas id="snapCanvas" style="display:none"></canvas>
-    </div>
+<div id="player-container">
+  <video id="video" autoplay muted playsinline preload="metadata"></video>
 </div>
 
+<div id="status"><span class="st-dot"></span><span id="statusText">Live</span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script>
+
 <script>
-(function() {
-    "use strict";
+(function () {
+  "use strict";
 
-    // ============ CONFIG ============
-    const STREAM_URL = "https://a96aivottlinear-a.akamaihd.net/OTTB/iad-nitro/live/clients/dash/enc/szep2s50dy/out/v1/0654483782a74c1e9e3e578377d28fc6/cenc.mpd";
-    const CLEAR_KEYS = {
-        "c4e6bd30698f91c0d1e99e505d8859c7": "cea8ba61e532c7143c630f0c9becd7a6"
-    };
+  const CONFIG = {
+    streamUrl: "https://sonygdrm.sonyliv.com/DASH/b4bab2181c6344cbbdb499c0d72d59dc/1794707862/baseline-std-v4/MULTITV_km_5047_1053_208813_eng_baseline-800300010.mpd?hdnea=exp=1794755589~acl=/DASH/b4bab2181c6344cbbdb499c0d72d59dc/1794707862/baseline-std-v4/MULTITV_km_5047_1053_208813_eng_baseline-800300010.mpd*~id=93aa24b1f1c24cdbb9ba7822a94bce4d-1762542986668~hmac=ad492596bfc08310f5a1a09c9154b0a47ef38766dcc6a2ccd32fa796bf701c8d",
+    drmKeys: [
+      "c20ba4e9d0635bab9f17b177f0d91039:fcb4a266539ac7b03ef02c5600c5598d",
+      "c592c427c0d35e9a8ad88cdcb76a16c1:8ecb737e4015c22451d6c14fe37e9e15",
+      "10f4930166fa5b6ab5d71a4a978bdfac:9dfa22aa4d6a3d820101f59013de0236",
+      "140edf90fa0b5c99864f2442df4df535:991b51ed2e690c96163a31ae4a6f6452",
+      "e392571e46bd5461854986ae9e58083d:1167c024aa8bbad2c1beaf218cfeec11"
+    ],
+    cookieUrl: "https://allrounder2-0.pages.dev/api/hindi.json"
+  };
 
-    // ============ STATE ============
-    let player = null;
-    let ui = null;
-    let controls = null;
-    let video = null;
-    let controlsHideTimer = null;
-    let isLive = true;
-    let duration = 0;
-    let seeking = false;
+  const video = document.getElementById("video");
+  const container = document.getElementById("player-container");
+  const statusEl = document.getElementById("status");
+  const statusText = document.getElementById("statusText");
 
-    // ============ DOM ============
-    const $ = (id) => document.getElementById(id);
-    const customSpinner = $("customSpinner");
-    const spinnerText = $("spinnerText");
-    const topBar = $("topBar");
-    const controlsOverlay = $("controlsOverlay");
-    const centerPlay = $("centerPlay");
-    const playBtn = $("playBtn");
-    const playIcon = $("playIcon");
-    const pauseIcon = $("pauseIcon");
-    const muteBtn = $("muteBtn");
-    const volHighIcon = $("volHighIcon");
-    const volMuteIcon = $("volMuteIcon");
-    const volumeRange = $("volumeRange");
-    const seekBar = $("seekBar");
-    const seekBuffered = $("seekBuffered");
-    const seekPlayed = $("seekPlayed");
-    const seekThumb = $("seekThumb");
-    const currentTimeEl = $("currentTime");
-    const durationEl = $("duration");
-    const liveBtn = $("liveBtn");
-    const fullscreenBtn = $("fullscreenBtn");
-    const fsEnterIcon = $("fsEnterIcon");
-    const fsExitIcon = $("fsExitIcon");
-    const settingsBtn = $("settingsBtn");
-    const settingsMenu = $("settingsMenu");
-    const screenshotBtn = $("screenshotBtn");
-    const pipBtn = $("pipBtn");
-    const kbHintBtn = $("kbHintBtn");
-    const kbdHint = $("kbdHint");
-    const bufferPill = $("bufferPill");
-    const bufferText = $("bufferText");
-    const toastContainer = $("toastContainer");
-    const errorOverlay = $("errorOverlay");
-    const errorTitle = $("errorTitle");
-    const errorMsg = $("errorMsg");
-    const retryBtn = $("retryBtn");
-    const flash = $("flash");
-    const snapCanvas = $("snapCanvas");
-    const channelTitle = $("channelTitle");
+  let statusTimer = null;
+  function setStatus(msg, type, dur) {
+    if (!statusEl) return;
+    statusText.textContent = msg || "Live";
+    statusEl.className = "show " + (type || "live");
+    if (statusTimer) { clearTimeout(statusTimer); statusTimer = null; }
+    if (dur !== 0) {
+      statusTimer = setTimeout(function () {
+        statusEl.className = statusEl.className.replace("show", "").trim();
+        statusTimer = null;
+      }, dur || 4000);
+    }
+  }
 
-    // ============ TOAST ============
-    function toast(msg, type = "info", duration = 2500) {
-        const t = document.createElement("div");
-        t.className = `toast ${type}`;
-        t.textContent = msg;
-        toastContainer.appendChild(t);
-        setTimeout(() => {
-            t.classList.add("fade-out");
-            setTimeout(() => t.remove(), 300);
-        }, duration);
+  function injectFitButton(containerEl, videoEl) {
+    const panel = containerEl.querySelector(".shaka-controls-button-panel");
+    if (!panel) return false;
+
+    const anchor = panel.querySelector(".shaka-fullscreen-button");
+    const FITS = ["contain", "fill", "cover"];
+    const FIT_LABELS = { contain: "Fit", fill: "Fill", cover: "Zoom" };
+    let fitIdx = 0;
+
+    const fitBtn = document.createElement("button");
+    fitBtn.className = "sp-fit-btn";
+    fitBtn.title = "Video Fit: " + FIT_LABELS.contain;
+    fitBtn.setAttribute("aria-label", "Cycle Video Fit Mode");
+    fitBtn.innerHTML = '<span class="fit-pill">—</span>';
+
+    if (anchor) panel.insertBefore(fitBtn, anchor);
+    else panel.appendChild(fitBtn);
+
+    let currentRatio = "—";
+
+    function applyFit(i) {
+      fitIdx = i;
+      const m = FITS[i];
+      videoEl.classList.remove("mode-fill", "mode-cover");
+      if (m === "fill") videoEl.classList.add("mode-fill");
+      if (m === "cover") videoEl.classList.add("mode-cover");
+      fitBtn.classList.remove("mode-fill", "mode-cover");
+      if (m !== "contain") fitBtn.classList.add("mode-" + m);
+      fitBtn.title = "Video Fit: " + FIT_LABELS[m];
+      const pill = fitBtn.querySelector(".fit-pill");
+      if (pill) pill.textContent = (m === "contain") ? currentRatio : FIT_LABELS[m];
     }
 
-    // ============ SPINNER ============
-    function showSpinner(text) {
-        if (text) spinnerText.textContent = text;
-        customSpinner.classList.remove("hidden");
-    }
-    function hideSpinner() {
-        customSpinner.classList.add("hidden");
-    }
-
-    // ============ CONTROLS AUTO-HIDE ============
-    function showControls() {
-        topBar.classList.remove("hidden");
-        controlsOverlay.classList.remove("hidden");
-        clearTimeout(controlsHideTimer);
-        controlsHideTimer = setTimeout(() => {
-            if (!video.paused && !video.ended && !settingsMenu.classList.contains("show")) {
-                topBar.classList.add("hidden");
-                controlsOverlay.classList.add("hidden");
-            }
-        }, 3500);
-    }
-    function hideControlsNow() {
-        topBar.classList.add("hidden");
-        controlsOverlay.classList.add("hidden");
-        settingsMenu.classList.remove("show");
-    }
-
-    // ============ FORMATTERS ============
-    function formatTime(sec) {
-        if (!isFinite(sec) || sec < 0) sec = 0;
-        const h = Math.floor(sec / 3600);
-        const m = Math.floor((sec % 3600) / 60);
-        const s = Math.floor(sec % 60);
-        const pad = (n) => String(n).padStart(2, "0");
-        if (h > 0) return `${h}:${pad(m)}:${pad(s)}`;
-        return `${m}:${pad(s)}`;
-    }
-
-    // ============ PLAYER INIT ============
-    async function initPlayer() {
-        video = $("video");
-        hideError();
-        showSpinner("Loading stream…");
-
-        try {
-            ui = video.ui;
-            controls = ui.getControls();
-            player = controls.getPlayer();
-            window.player = player;
-            window.ui = ui;
-
-            player.configure({
-                drm: { clearKeys: CLEAR_KEYS },
-                streaming: {
-                    bufferingGoal: 30,
-                    rebufferingGoal: 2,
-                    bufferBehind: 30,
-                    retryParameters: {
-                        maxAttempts: 5,
-                        baseDelay: 1000,
-                        backoffFactor: 2,
-                        fuzzFactor: 0.5,
-                        timeout: 30000
-                    }
-                }
-            });
-
-            // Hide shaka's own UI; we'll use ours
-            ui.configure({
-                controlPanelElements: [],
-                overflowMenuButtons: []
-            });
-            const shakaControls = document.querySelector(".shaka-controls-container");
-            if (shakaControls) shakaControls.style.display = "none";
-
-            player.addEventListener("error", onPlayerErrorEvent);
-
-            await player.load(STREAM_URL, /* startMarginSeconds */ 0, /* mimeType */ null);
-            isLive = player.isLive();
-            duration = video.duration || (isLive ? Infinity : 0);
-
-            attachVideoEvents();
-            hideSpinner();
-            showControls();
-            toast("Stream connected", "success", 1800);
-
-            if (isLive) {
-                durationEl.textContent = "LIVE";
-                liveBtn.classList.add("active");
-            } else {
-                durationEl.textContent = formatTime(duration);
-                liveBtn.style.display = "none";
-            }
-
-            // Try to read channel name from manifest title if present
-            try {
-                const tracks = player.getVariantTracks();
-                if (tracks && tracks.length) {
-                    channelTitle.textContent = "Live Stream";
-                }
-            } catch (_) {}
-
-            // Try unmute on user interaction (browser autoplay policy)
-            video.muted = false;
-            try { await video.play(); } catch (e) {
-                // Autoplay with sound blocked; keep muted
-                video.muted = true;
-                try { await video.play(); } catch (_) {}
-                toast("Tap anywhere to enable sound", "info", 3000);
-            }
-
-            // Update play/pause icon
-            updatePlayIcon();
-            updateVolumeIcon();
-        } catch (error) {
-            hideSpinner();
-            showError(error);
-        }
-    }
-
-    // ============ VIDEO EVENT LISTENERS ============
-    function attachVideoEvents() {
-        video.addEventListener("play", () => { updatePlayIcon(); centerPlay.classList.remove("show"); });
-        video.addEventListener("pause", () => { updatePlayIcon(); centerPlay.classList.add("show"); });
-        video.addEventListener("playing", hideSpinner);
-        video.addEventListener("waiting", () => showSpinner("Buffering…"));
-        video.addEventListener("volumechange", updateVolumeIcon);
-        video.addEventListener("timeupdate", updateProgress);
-        video.addEventListener("progress", updateBuffered);
-        video.addEventListener("ratechange", () => {
-            document.querySelectorAll(".settings-item[data-speed]").forEach(el => {
-                el.classList.toggle("selected", parseFloat(el.dataset.speed) === video.playbackRate);
-            });
-        });
-        video.addEventListener("dblclick", toggleFullscreen);
-        video.addEventListener("click", (e) => {
-            // Single-click toggles play/pause (delay so double-click can be detected)
-            if (video.clickTimer) return;
-            video.clickTimer = setTimeout(() => {
-                video.clickTimer = null;
-                togglePlay();
-            }, 200);
-        });
-        video.addEventListener("dblclick", () => {
-            if (video.clickTimer) { clearTimeout(video.clickTimer); video.clickTimer = null; }
-        });
-        video.addEventListener("mousemove", showControls);
-        video.addEventListener("touchstart", showControls, { passive: true });
-        video.addEventListener("enterpictureinpicture", () => toast("PiP active", "info", 1500));
-        video.addEventListener("leavepictureinpicture", () => toast("Exited PiP", "info", 1500));
-
-        document.addEventListener("mousemove", showControls);
-    }
-
-    // ============ PLAYBACK ============
-    function togglePlay() {
-        if (!video) return;
-        if (video.paused) {
-            video.play().catch(() => {});
-        } else {
-            video.pause();
-        }
-    }
-    function updatePlayIcon() {
-        if (video.paused) {
-            playIcon.style.display = "";
-            pauseIcon.style.display = "none";
-            centerPlay.classList.add("show");
-        } else {
-            playIcon.style.display = "none";
-            pauseIcon.style.display = "";
-            centerPlay.classList.remove("show");
-        }
-    }
-
-    // ============ VOLUME ============
-    function toggleMute() {
-        video.muted = !video.muted;
-        if (!video.muted && video.volume === 0) {
-            video.volume = 0.5;
-            volumeRange.value = 0.5;
-        }
-    }
-    function updateVolumeIcon() {
-        const muted = video.muted || video.volume === 0;
-        volHighIcon.style.display = muted ? "none" : "";
-        volMuteIcon.style.display = muted ? "" : "none";
-        volumeRange.value = video.muted ? 0 : video.volume;
-    }
-
-    // ============ SEEK / PROGRESS ============
-    function updateProgress() {
-        if (!video) return;
-        const cur = video.currentTime || 0;
-        currentTimeEl.textContent = isLive ? "LIVE" : formatTime(cur);
-        if (isFinite(duration) && duration > 0 && !isLive) {
-            const pct = (cur / duration) * 100;
-            seekPlayed.style.width = pct + "%";
-            seekThumb.style.left = pct + "%";
-        } else if (isLive) {
-            // For live, show how far behind the live edge
-            const liveEdge = player ? player.seekRange().end : cur;
-            const behind = Math.max(0, liveEdge - cur);
-            const totalSeekable = (player ? player.seekRange().end - player.seekRange().start : 0);
-            if (totalSeekable > 0) {
-                const pct = ((cur - player.seekRange().start) / totalSeekable) * 100;
-                seekPlayed.style.width = pct + "%";
-                seekThumb.style.left = pct + "%";
-            }
-            currentTimeEl.textContent = `-${formatTime(behind)}`;
-        }
-    }
-    function updateBuffered() {
-        if (!video || !video.buffered || video.buffered.length === 0) return;
-        const end = video.buffered.end(video.buffered.length - 1);
-        const total = (isLive && player ? player.seekRange().end - player.seekRange().start : duration) || end;
-        if (total > 0) {
-            const pct = (end / total) * 100;
-            seekBuffered.style.width = pct + "%";
-        }
-        // Buffer health pill
-        const bufferedAhead = Math.max(0, end - (video.currentTime || 0));
-        bufferText.textContent = bufferedAhead.toFixed(1) + "s";
-        bufferPill.classList.remove("low", "crit");
-        if (bufferedAhead < 1) bufferPill.classList.add("crit");
-        else if (bufferedAhead < 3) bufferPill.classList.add("low");
-    }
-
-    function seekFromEvent(e) {
-        const rect = seekBar.getBoundingClientRect();
-        const x = (e.clientX || (e.touches && e.touches[0].clientX) || 0) - rect.left;
-        const ratio = Math.max(0, Math.min(1, x / rect.width));
-        if (isLive && player) {
-            const sr = player.seekRange();
-            const target = sr.start + ratio * (sr.end - sr.start);
-            video.currentTime = target;
-        } else if (isFinite(duration)) {
-            video.currentTime = ratio * duration;
-        }
-    }
-
-    // ============ FULLSCREEN ============
-    function toggleFullscreen() {
-        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            const el = document.querySelector(".app-wrap");
-            const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-            if (req) req.call(el).catch(() => {});
-        } else {
-            const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
-            if (exit) exit.call(document);
-        }
-    }
-    function updateFullscreenIcon() {
-        const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-        fsEnterIcon.style.display = isFs ? "none" : "";
-        fsExitIcon.style.display = isFs ? "" : "none";
-    }
-    document.addEventListener("fullscreenchange", updateFullscreenIcon);
-    document.addEventListener("webkitfullscreenchange", updateFullscreenIcon);
-
-    // ============ PIP ============
-    async function togglePip() {
-        try {
-            if (document.pictureInPictureElement) {
-                await document.exitPictureInPicture();
-            } else if (document.pictureInPictureEnabled && video.requestPictureInPicture) {
-                await video.requestPictureInPicture();
-            } else {
-                toast("PiP not supported", "error");
-            }
-        } catch (e) {
-            toast("PiP failed: " + e.message, "error");
-        }
-    }
-
-    // ============ SCREENSHOT ============
-    function takeScreenshot() {
-        if (!video || !video.videoWidth) {
-            toast("Stream not ready", "error");
-            return;
-        }
-        // IMPORTANT: video must be same-origin or CORS-enabled; tainted canvas will throw
-        try {
-            snapCanvas.width = video.videoWidth;
-            snapCanvas.height = video.videoHeight;
-            const ctx = snapCanvas.getContext("2d");
-            ctx.drawImage(video, 0, 0, snapCanvas.width, snapCanvas.height);
-            const dataUrl = snapCanvas.toDataURL("image/png");
-            // Flash effect
-            flash.classList.remove("fire");
-            void flash.offsetWidth;
-            flash.classList.add("fire");
-            // Download
-            const a = document.createElement("a");
-            a.href = dataUrl;
-            a.download = `snapshot_${Date.now()}.png`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            toast("Screenshot saved", "success", 1500);
-        } catch (e) {
-            toast("Screenshot blocked by CORS", "error", 3500);
-        }
-    }
-
-    // ============ SETTINGS ============
-    function toggleSettings() {
-        settingsMenu.classList.toggle("show");
-    }
-    settingsMenu.addEventListener("click", (e) => {
-        const item = e.target.closest(".settings-item");
-        if (!item) return;
-        if (item.dataset.speed) {
-            video.playbackRate = parseFloat(item.dataset.speed);
-            toast(`Speed: ${item.dataset.speed}×`, "info", 1200);
-        } else if (item.dataset.quality) {
-            applyQuality(item.dataset.quality);
-            toast(`Quality: ${item.dataset.quality === "auto" ? "Auto" : item.dataset.quality + "p"}`, "info", 1200);
-            document.querySelectorAll(".settings-item[data-quality]").forEach(el => el.classList.remove("selected"));
-            item.classList.add("selected");
-        }
-        setTimeout(() => settingsMenu.classList.remove("show"), 400);
+    fitBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      applyFit((fitIdx + 1) % FITS.length);
     });
 
-    function applyQuality(q) {
-        if (!player) return;
-        try {
-            const tracks = player.getVariantTracks();
-            if (q === "auto") {
-                player.configure({ abr: { enabled: true } });
-                return;
-            }
-            const h = parseInt(q, 10);
-            player.configure({ abr: { enabled: false } });
-            // Pick the closest track by height
-            let best = null;
-            let bestDiff = Infinity;
-            for (const t of tracks) {
-                if (t.height) {
-                    const diff = Math.abs(t.height - h);
-                    if (diff < bestDiff) { bestDiff = diff; best = t; }
-                }
-            }
-            if (best) player.selectVariantTrack(best, true);
-        } catch (e) {
-            console.warn("Quality change failed:", e);
-        }
+    ["fullscreenchange", "webkitfullscreenchange"].forEach(function (ev) {
+      document.addEventListener(ev, function () {
+        if (!(document.fullscreenElement || document.webkitFullscreenElement)) applyFit(0);
+      });
+    });
+
+    function ratioLabel(w, h) {
+      if (!w || !h) return "—";
+      function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+      const g = gcd(w, h) || 1, rw = w / g, rh = h / g;
+      const named = { "16:9": 16 / 9, "4:3": 4 / 3, "21:9": 21 / 9, "1:1": 1, "9:16": 9 / 16, "3:2": 3 / 2, "5:4": 5 / 4, "2:1": 2 };
+      const real = w / h;
+      let best = null, bestD = 0.02;
+      Object.keys(named).forEach(function (k) {
+        const d = Math.abs(named[k] - real);
+        if (d < bestD) { bestD = d; best = k; }
+      });
+      if (best) return best;
+      if (rw <= 40 && rh <= 40) return rw + ":" + rh;
+      return real.toFixed(2) + ":1";
     }
 
-    // ============ ERROR HANDLING ============
-    function onPlayerErrorEvent(event) { onPlayerError(event.detail); }
-    function onPlayerError(error) {
-        console.error("Player error:", error);
-        hideSpinner();
-        showError(error);
-    }
-    function showError(error) {
-        const code = error && error.code ? error.code : "UNKNOWN";
-        let title = "Stream Error";
-        let msg = "An error occurred while loading the stream. Please try again.";
-        const category = Math.floor(code / 1000);
-        if (category === 1) { title = "Network Error"; msg = "The stream couldn't be reached. Check your internet connection and retry."; }
-        else if (category === 2) { title = "Format Error"; msg = "The stream format is not supported in this browser."; }
-        else if (category === 3) { title = "Playback Error"; msg = "The stream was interrupted. This may be a temporary issue."; }
-        else if (category === 4) { title = "DRM Error"; msg = "There was a problem decrypting the stream content."; }
-        else if (category === 5 || category === 6 || category === 7) { title = "Streaming Error"; msg = "The streaming server returned an error. Retrying shortly…"; }
-        else if (category === 9) { title = "Manifest Error"; msg = "The stream manifest could not be loaded or parsed."; }
-        errorTitle.textContent = title;
-        errorMsg.textContent = msg + (error && error.message ? ` (Code ${code})` : ` (Code ${code})`);
-        errorOverlay.classList.add("show");
-    }
-    function hideError() { errorOverlay.classList.remove("show"); }
-
-    // ============ KEYBOARD SHORTCUTS ============
-    document.addEventListener("keydown", (e) => {
-        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
-        const k = e.key;
-        switch (k) {
-            case " ":
-            case "k":
-                e.preventDefault(); togglePlay(); break;
-            case "f": case "F":
-                toggleFullscreen(); break;
-            case "m": case "M":
-                toggleMute(); break;
-            case "p": case "P":
-                togglePip(); break;
-            case "s": case "S":
-                takeScreenshot(); break;
-            case "?":
-                kbdHint.classList.toggle("show");
-                break;
-            case "ArrowUp":
-                e.preventDefault();
-                video.volume = Math.min(1, video.volume + 0.1);
-                toast(`Volume: ${Math.round(video.volume * 100)}%`, "info", 800);
-                break;
-            case "ArrowDown":
-                e.preventDefault();
-                video.volume = Math.max(0, video.volume - 0.1);
-                toast(`Volume: ${Math.round(video.volume * 100)}%`, "info", 800);
-                break;
-            case "ArrowLeft":
-                e.preventDefault();
-                video.currentTime = Math.max(0, video.currentTime - 10);
-                toast("-10s", "info", 700);
-                break;
-            case "ArrowRight":
-                e.preventDefault();
-                video.currentTime = video.currentTime + 10;
-                toast("+10s", "info", 700);
-                break;
-            case "0": case "1": case "2": case "3": case "4": case "5":
-            case "6": case "7": case "8": case "9":
-                if (!isLive && isFinite(duration)) {
-                    const pct = parseInt(k, 10) / 10;
-                    video.currentTime = duration * pct;
-                    toast(`Jump to ${pct * 100}%`, "info", 700);
-                }
-                break;
-        }
-        showControls();
-    });
-
-    // ============ EVENT BINDINGS ============
-    playBtn.addEventListener("click", togglePlay);
-    muteBtn.addEventListener("click", toggleMute);
-    volumeRange.addEventListener("input", () => {
-        video.volume = parseFloat(volumeRange.value);
-        video.muted = video.volume === 0;
-    });
-    fullscreenBtn.addEventListener("click", toggleFullscreen);
-    pipBtn.addEventListener("click", togglePip);
-    screenshotBtn.addEventListener("click", takeScreenshot);
-    settingsBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleSettings(); });
-    document.addEventListener("click", (e) => {
-        if (!settingsMenu.contains(e.target) && e.target !== settingsBtn && !settingsBtn.contains(e.target)) {
-            settingsMenu.classList.remove("show");
-        }
-    });
-    liveBtn.addEventListener("click", () => {
-        if (player && isLive) {
-            video.currentTime = player.seekRange().end - 0.5;
-            toast("Jumped to live edge", "success", 1200);
-        }
-    });
-
-    // Seek bar drag
-    seekBar.addEventListener("mousedown", (e) => {
-        seeking = true;
-        seekFromEvent(e);
-    });
-    seekBar.addEventListener("touchstart", (e) => {
-        seeking = true;
-        seekFromEvent(e);
-    }, { passive: true });
-    document.addEventListener("mousemove", (e) => { if (seeking) seekFromEvent(e); });
-    document.addEventListener("touchmove", (e) => { if (seeking) seekFromEvent(e); }, { passive: true });
-    document.addEventListener("mouseup", () => seeking = false);
-    document.addEventListener("touchend", () => seeking = false);
-
-    // Center play
-    centerPlay.addEventListener("click", togglePlay);
-
-    // Retry
-    retryBtn.addEventListener("click", () => {
-        hideError();
-        if (player) {
-            try { player.destroy(); } catch (_) {}
-        }
-        initPlayer();
-    });
-
-    // Kb hint button
-    kbHintBtn.addEventListener("click", () => kbdHint.classList.toggle("show"));
-    document.addEventListener("click", (e) => {
-        if (kbdHint.classList.contains("show") &&
-            !kbdHint.contains(e.target) &&
-            e.target !== kbHintBtn &&
-            !kbHintBtn.contains(e.target)) {
-            kbdHint.classList.remove("show");
-        }
-    });
-
-    // ============ TELEGRAM POPUP ============
-    const tgPopupBackdrop = $("tgPopupBackdrop");
-    const tgPopupClose = $("tgPopupClose");
-    const tgTopBtn = $("tgTopBtn");
-
-    function showTelegramPopup() {
-        if (tgPopupBackdrop) tgPopupBackdrop.classList.add("show");
-    }
-    function hideTelegramPopup() {
-        if (tgPopupBackdrop) tgPopupBackdrop.classList.remove("show");
+    let ratioTries = 0;
+    function updateRatio() {
+      const pill = fitBtn.querySelector(".fit-pill");
+      if (!pill) return;
+      if (videoEl.videoWidth > 0) {
+        currentRatio = ratioLabel(videoEl.videoWidth, videoEl.videoHeight);
+        if (FITS[fitIdx] === "contain") pill.textContent = currentRatio;
+        ratioTries = 0;
+      } else if (ratioTries < 15) {
+        ratioTries++;
+        setTimeout(updateRatio, 700);
+      }
     }
 
-    if (tgPopupClose) {
-        tgPopupClose.addEventListener("click", hideTelegramPopup);
-    }
-    if (tgPopupBackdrop) {
-        // Close when clicking outside the popup card
-        tgPopupBackdrop.addEventListener("click", (e) => {
-            if (e.target === tgPopupBackdrop) hideTelegramPopup();
-        });
-        // Close on Escape
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape" && tgPopupBackdrop.classList.contains("show")) {
-                hideTelegramPopup();
-            }
-        });
-    }
-
-    // Show popup on every page open (small delay so it appears after first paint)
-    setTimeout(showTelegramPopup, 800);
-
-    // ============ BOOT ============
-    document.addEventListener("shaka-ui-loaded", () => {
-        initPlayer();
+    videoEl.addEventListener("loadedmetadata", function () { ratioTries = 0; updateRatio(); });
+    videoEl.addEventListener("resize", updateRatio);
+    videoEl.addEventListener("timeupdate", function onFirstFrame() {
+      videoEl.removeEventListener("timeupdate", onFirstFrame);
+      updateRatio();
     });
-    document.addEventListener("shaka-ui-load-failed", () => {
-        hideSpinner();
-        showError({ code: 2001, message: "UI library failed to load" });
+    updateRatio();
+
+    return true;
+  }
+
+  function buildClearKeys(keyArray) {
+    const clearKeys = {};
+    if (!Array.isArray(keyArray)) return clearKeys;
+    keyArray.forEach(function (pair) {
+      if (!pair || typeof pair !== "string") return;
+      const idx = pair.indexOf(":");
+      if (idx === -1) return;
+      const kid = pair.slice(0, idx).trim();
+      const key = pair.slice(idx + 1).trim();
+      if (kid && key) clearKeys[kid] = key;
+    });
+    return clearKeys;
+  }
+
+  async function initPlayer() {
+    shaka.polyfill.installAll();
+    if (!shaka.Player.isBrowserSupported()) {
+      setStatus("Browser Not Supported", "err", 0);
+      return;
+    }
+
+    const player = new shaka.Player();
+    await player.attach(video);
+
+    const ui = new shaka.ui.Overlay(player, container, video);
+    ui.configure({
+      addBigPlayButton: true,
+      controlPanelElements: [
+        "play_pause",
+        "mute",
+        "time_and_duration",
+        "spacer",
+        "quality",
+        "picture_in_picture",
+        "fullscreen"
+      ],
+      seekBarColors: {
+        base: "#828282",
+        buffered: "#ffc336",
+        played: "#1fc7ff"
+      }
     });
 
-    // Periodic buffer health update
-    setInterval(() => {
-        if (video && video.buffered.length) {
-            updateBuffered();
+    let injectCount = 0;
+    (function tryInject() {
+      if (injectFitButton(container, video)) return;
+      if (++injectCount < 5) setTimeout(tryInject, 150);
+    })();
+
+    const clearKeys = buildClearKeys(CONFIG.drmKeys);
+
+    player.configure({
+      drm: { clearKeys: clearKeys },
+      manifest: { defaultPresentationDelay: 5 },
+      streaming: {
+        lowLatencyMode: true,
+        bufferingGoal: 10,
+        rebufferingGoal: 2,
+        safeSeekOffset: 5
+      }
+    });
+
+    let cookieValue = "";
+    try {
+      const response = await fetch(CONFIG.cookieUrl, { cache: "no-store" });
+      const data = await response.json();
+      cookieValue = data.cookie || "";
+    } catch (e) {}
+
+    if (cookieValue) {
+      player.getNetworkingEngine().registerRequestFilter(function (type, request) {
+        request.headers["Referer"] = "https://www.jiotv.com/";
+        request.headers["User-Agent"] = "plaYtv/7.1.5 (Linux;Android 13) ExoPlayerLib/2.11.6";
+        request.headers["Cookie"] = cookieValue;
+
+        let urlCookie = cookieValue.startsWith("__hdnea__=") ? cookieValue.slice(10) : cookieValue;
+        if ((type === shaka.net.NetworkingEngine.RequestType.MANIFEST ||
+             type === shaka.net.NetworkingEngine.RequestType.SEGMENT) &&
+            !request.uris[0].includes("__hdnea__")) {
+          const sep = request.uris[0].includes("?") ? "&" : "?";
+          request.uris[0] += sep + "__hdnea__=" + urlCookie;
         }
-    }, 1000);
+      });
+    }
 
+    try {
+      setStatus("Loading…", "warn", 0);
+      await player.load(CONFIG.streamUrl);
+      setStatus("Live", "live", 4000);
+      video.play().catch(function () {});
+    } catch (e) {
+      setStatus("Error loading stream", "err", 0);
+    }
+
+    video.addEventListener("play", function () {
+      video.muted = false;
+    });
+
+    function unmuteOnce() { video.muted = false; }
+    container.addEventListener("pointerdown", unmuteOnce, { capture: true, once: true });
+    container.addEventListener("click", unmuteOnce, { capture: true, once: true });
+
+    player.addEventListener("error", function (ev) {
+      const err = ev.detail;
+      setStatus("Stream error: " + (err.code || ""), "err", 5000);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", initPlayer);
 })();
 </script>
 </body>
+   <script>(function(s){s.dataset.zone='12181978',s.src='https://llvpn.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 </html>
+
